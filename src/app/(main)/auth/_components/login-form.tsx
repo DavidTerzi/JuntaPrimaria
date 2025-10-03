@@ -4,6 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -11,29 +13,63 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 
 const FormSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  username: z.string().min(1, { message: "Usuario o email es requerido." }),
+  password: z.string().min(1, { message: "Contraseña es requerida." }),
   remember: z.boolean().optional(),
 });
 
+type FormData = z.infer<typeof FormSchema>;
+
 export function LoginForm() {
-  const form = useForm<z.infer<typeof FormSchema>>({
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  
+  const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
       remember: false,
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    toast("You submitted the following values", {
-      description: (
-        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  const onSubmit = async (data: FormData) => {
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: data.username,
+          password: data.password,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success("¡Login exitoso!", {
+          description: `Bienvenido, ${result.user.nombre} ${result.user.apellido}`,
+        });
+
+        // Redireccionar al dashboard
+        router.push('/dashboard/default');
+      } else {
+        toast.error("Error de autenticación", {
+          description: result.message,
+        });
+      }
+    } catch (error) {
+      console.error('Error en login:', error);
+      toast.error("Error de conexión", {
+        description: "No se pudo conectar con el servidor",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -41,12 +77,19 @@ export function LoginForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="email"
+          name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email Address</FormLabel>
+              <FormLabel>Usuario o Email</FormLabel>
               <FormControl>
-                <Input id="email" type="email" placeholder="you@example.com" autoComplete="email" {...field} />
+                <Input 
+                  id="username" 
+                  type="text" 
+                  placeholder="admin o admin@juntaprimaria.gov.ar" 
+                  autoComplete="username" 
+                  disabled={isLoading}
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -57,13 +100,14 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>Contraseña</FormLabel>
               <FormControl>
                 <Input
                   id="password"
                   type="password"
                   placeholder="••••••••"
                   autoComplete="current-password"
+                  disabled={isLoading}
                   {...field}
                 />
               </FormControl>
@@ -79,19 +123,20 @@ export function LoginForm() {
               <FormControl>
                 <Checkbox
                   id="login-remember"
-                  checked={field.value}
+                  checked={field.value || false}
                   onCheckedChange={field.onChange}
                   className="size-4"
+                  disabled={isLoading}
                 />
               </FormControl>
               <FormLabel htmlFor="login-remember" className="text-muted-foreground ml-1 text-sm font-medium">
-                Remember me for 30 days
+                Recordarme por 30 días
               </FormLabel>
             </FormItem>
           )}
         />
-        <Button className="w-full" type="submit">
-          Login
+        <Button className="w-full" type="submit" disabled={isLoading}>
+          {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
         </Button>
       </form>
     </Form>

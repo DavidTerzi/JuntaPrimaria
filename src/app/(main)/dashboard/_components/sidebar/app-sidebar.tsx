@@ -1,6 +1,6 @@
 "use client";
 
-import { Settings, CircleHelp, Search, Database, ClipboardList, File, Command } from "lucide-react";
+import { Settings, CircleHelp, Search, Database, ClipboardList, File } from "lucide-react";
 
 import {
   Sidebar,
@@ -11,7 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { APP_CONFIG } from "@/config/app-config";
+import { Logo } from "@/components/logo";
 import { rootUser } from "@/data/users";
 import { sidebarItems } from "@/navigation/sidebar/sidebar-items";
 
@@ -62,9 +62,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
-              <a href="#">
-                <Command />
-                <span className="text-base font-semibold">{APP_CONFIG.name}</span>
+              <a href="/dashboard/default">
+                <Logo size="sm" showText={false} />
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

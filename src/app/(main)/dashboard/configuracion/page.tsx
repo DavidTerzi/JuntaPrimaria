@@ -1,15 +1,18 @@
+// app/(main)/dashboard/configuracion/page.tsx
 "use client";
 
 import { useState } from "react";
 import { Settings, Layout, User, Shield } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export default function Page() {
+export default function ConfiguracionPage() {
   const [activeTab, setActiveTab] = useState("general");
 
   return (
@@ -56,11 +59,36 @@ export default function Page() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="nombre">Nombre del Sistema</Label>
-                  <Input id="nombre" defaultValue="Sistema de Junta Primaria de San Juan" />
+                  <Input id="nombre" defaultValue="Sistema de Junta Primaria" />
                 </div>
                 <div>
                   <Label htmlFor="version">Versión</Label>
-                  <Input id="version" defaultValue="2.0.0" disabled />
+                  <Input id="version" defaultValue="1.0.0" disabled />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="idioma">Idioma</Label>
+                  <Select defaultValue="es">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="es">Español</SelectItem>
+                      <SelectItem value="en">English</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="zona">Zona Horaria</Label>
+                  <Select defaultValue="argentina">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="argentina">Argentina (Buenos Aires)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </CardContent>
@@ -81,6 +109,18 @@ export default function Page() {
                 </div>
                 <Switch />
               </div>
+              <div>
+                <Label htmlFor="tema">Preset de Colores</Label>
+                <Select defaultValue="default">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="default">Por Defecto</SelectItem>
+                    <SelectItem value="gobierno">Gobierno San Juan</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -88,19 +128,30 @@ export default function Page() {
         <TabsContent value="usuario" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Información del Perfil</CardTitle>
-              <CardDescription>Gestiona tu información personal</CardDescription>
+              <CardTitle>Información Personal</CardTitle>
+              <CardDescription>Actualiza tu información de perfil</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid gap-4">
-                <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
                   <Label htmlFor="nombre-usuario">Nombre Completo</Label>
-                  <Input id="nombre-usuario" defaultValue="Administrator" />
+                  <Input id="nombre-usuario" placeholder="Tu nombre completo" />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email-usuario">Correo Electrónico</Label>
-                  <Input id="email-usuario" type="email" defaultValue="admin@sanjuan.gov.ar" />
+                <div>
+                  <Label htmlFor="email">Correo Electrónico</Label>
+                  <Input id="email" type="email" placeholder="tu@email.com" />
                 </div>
+              </div>
+              <div>
+                <Label htmlFor="telefono">Teléfono</Label>
+                <Input id="telefono" placeholder="+54 xxx xxx xxx" />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Notificaciones por Email</Label>
+                  <p className="text-sm text-muted-foreground">Recibir actualizaciones por correo</p>
+                </div>
+                <Switch defaultChecked />
               </div>
             </CardContent>
           </Card>

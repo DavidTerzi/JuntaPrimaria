@@ -1,12 +1,27 @@
 -- =====================================================
 -- SCRIPT SQL PARA AUTENTICACIÓN - JUNTA PRIMARIA
 -- =====================================================
--- Base de datos: junta_primaria_db
+-- Base de datos: juntaprimaria_db
 -- Descripción: Tablas para sistema de autenticación
 -- Fecha: 3 de octubre de 2025
 -- =====================================================
 
 USE `juntaprimaria_db`;
+
+-- Deshabilitar verificación de llaves foráneas temporalmente
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- =====================================================
+-- TABLA: usuarios
+-- Descripción: Almacena los usuarios del sistema
+-- =====================================================
+DROP TABLE IF EXISTS `usuarios`;
+
+-- =====================================================
+-- TABLA: sesiones
+-- Descripción: Almacena las sesiones activas de usuarios
+-- =====================================================
+DROP TABLE IF EXISTS `sesiones`;
 
 -- =====================================================
 -- TABLA: roles
@@ -24,12 +39,6 @@ CREATE TABLE `roles` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_roles_nombre` (`nombre`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- =====================================================
--- TABLA: usuarios
--- Descripción: Almacena los usuarios del sistema
--- =====================================================
-DROP TABLE IF EXISTS `usuarios`;
 
 CREATE TABLE `usuarios` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -51,12 +60,6 @@ CREATE TABLE `usuarios` (
   KEY `fk_usuarios_rol` (`rol_id`),
   CONSTRAINT `fk_usuarios_rol` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- =====================================================
--- TABLA: sesiones
--- Descripción: Almacena las sesiones activas de usuarios
--- =====================================================
-DROP TABLE IF EXISTS `sesiones`;
 
 CREATE TABLE `sesiones` (
   `id` VARCHAR(128) NOT NULL,
@@ -160,6 +163,9 @@ BEGIN
 END //
 
 DELIMITER ;
+
+-- Rehabilitar verificación de llaves foráneas
+SET FOREIGN_KEY_CHECKS = 1;
 
 -- =====================================================
 -- SCRIPT COMPLETADO

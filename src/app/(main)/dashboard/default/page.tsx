@@ -9,7 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState("titulares");
@@ -25,9 +32,7 @@ export default function Page() {
             <Users className="h-6 w-6" />
             <h2 className="text-3xl font-bold tracking-tight">Sistema de Junta Primaria</h2>
           </div>
-          <p className="text-muted-foreground mt-2">
-            Gestión de titulares, suplencias y administración del sistema.
-          </p>
+          <p className="text-muted-foreground mt-2">Gestión de titulares, suplencias y administración del sistema.</p>
         </div>
       </div>
 
@@ -63,16 +68,12 @@ export default function Page() {
                 <CardDescription>Administrar y consultar información de titulares</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex flex-col gap-4 items-start">
-                  <Button 
-                    className="flex items-center space-x-2" 
-                    size="lg"
-                    onClick={() => setShowCargarForm(true)}
-                  >
+                <div className="flex flex-col items-start gap-4">
+                  <Button className="flex items-center space-x-2" size="lg" onClick={() => setShowCargarForm(true)}>
                     <UserPlus className="h-5 w-5" />
                     <span>Cargar Titular</span>
                   </Button>
-                  
+
                   <Dialog open={showBuscarModal} onOpenChange={setShowBuscarModal}>
                     <DialogTrigger asChild>
                       <Button variant="outline" className="flex items-center space-x-2" size="lg">
@@ -83,13 +84,11 @@ export default function Page() {
                     <DialogContent className="sm:max-w-md">
                       <DialogHeader>
                         <DialogTitle>Introducir el valor del parámetro</DialogTitle>
-                        <DialogDescription>
-                          Ingrese N° DNI
-                        </DialogDescription>
+                        <DialogDescription>Ingrese N° DNI</DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Input 
+                          <Input
                             placeholder="N° DNI"
                             value={buscarDni}
                             onChange={(e) => setBuscarDni(e.target.value)}
@@ -99,12 +98,14 @@ export default function Page() {
                           <Button variant="outline" onClick={() => setShowBuscarModal(false)}>
                             Cancelar
                           </Button>
-                          <Button onClick={() => {
-                            // TODO: Aquí se agregará la lógica de búsqueda cuando tengamos la base de datos
-                            console.log("Buscando DNI:", buscarDni);
-                            setShowBuscarModal(false);
-                            setBuscarDni(""); // Limpiar el campo
-                          }}>
+                          <Button
+                            onClick={() => {
+                              // TODO: Aquí se agregará la lógica de búsqueda cuando tengamos la base de datos
+                              console.log("Buscando DNI:", buscarDni);
+                              setShowBuscarModal(false);
+                              setBuscarDni(""); // Limpiar el campo
+                            }}
+                          >
                             Aceptar
                           </Button>
                         </div>
@@ -122,17 +123,13 @@ export default function Page() {
                     <CardTitle>Cargar Antigüedad Titular</CardTitle>
                     <CardDescription>Complete todos los campos requeridos</CardDescription>
                   </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setShowCargarForm(false)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setShowCargarForm(false)}>
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="dni">N° D.N.I.:</Label>
                     <Input id="dni" placeholder="Ingrese DNI" />
@@ -143,7 +140,7 @@ export default function Page() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="nombre">Nombre:</Label>
                     <Input id="nombre" placeholder="Ingrese nombre" />
@@ -154,7 +151,7 @@ export default function Page() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="fecha-titularizacion">Fecha de Titularización:</Label>
                     <Input id="fecha-titularizacion" type="date" />
@@ -171,11 +168,11 @@ export default function Page() {
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium bg-gray-100 p-2 rounded">
+                  <h3 className="rounded bg-gray-100 p-2 text-lg font-medium">
                     Datos para conformar el Listado de Traslado
                   </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="tipo-traslado">Tipo de Traslado:</Label>
                       <Select>
@@ -195,7 +192,7 @@ export default function Page() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <div className="space-y-2">
                       <Label htmlFor="categoria">Categoría:</Label>
                       <Select>
@@ -238,21 +235,13 @@ export default function Page() {
 
                   <div className="space-y-2">
                     <Label htmlFor="observaciones">Observaciones:</Label>
-                    <Textarea 
-                      id="observaciones" 
-                      placeholder="Ingrese observaciones"
-                      rows={4}
-                    />
+                    <Textarea id="observaciones" placeholder="Ingrese observaciones" rows={4} />
                   </div>
                 </div>
 
                 <div className="flex justify-center space-x-4 pt-4">
-                  <Button className="bg-blue-500 hover:bg-blue-600">
-                    Licencias
-                  </Button>
-                  <Button className="bg-blue-500 hover:bg-blue-600">
-                    Cargar Suplencias
-                  </Button>
+                  <Button className="bg-blue-500 hover:bg-blue-600">Licencias</Button>
+                  <Button className="bg-blue-500 hover:bg-blue-600">Cargar Suplencias</Button>
                 </div>
               </CardContent>
             </Card>

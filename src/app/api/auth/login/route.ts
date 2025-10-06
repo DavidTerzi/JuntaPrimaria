@@ -1,6 +1,6 @@
 // app/api/auth/login/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { validateLogin } from '@/lib/auth';
+import { NextRequest, NextResponse } from "next/server";
+import { validateLogin } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,11 +10,11 @@ export async function POST(request: NextRequest) {
     // Validar que se proporcionaron los campos requeridos
     if (!username || !password) {
       return NextResponse.json(
-        { 
-          success: false, 
-          message: 'Username y password son requeridos' 
+        {
+          success: false,
+          message: "Username y password son requeridos",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -27,39 +27,38 @@ export async function POST(request: NextRequest) {
         {
           success: true,
           message: result.message,
-          user: result.user
+          user: result.user,
         },
-        { status: 200 }
+        { status: 200 },
       );
 
       // Configurar cookie con el token
-      response.cookies.set('auth-token', result.token!, {
+      response.cookies.set("auth-token", result.token!, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7, // 7 días
-        path: '/'
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 3, // 3 horas
+        path: "/",
       });
 
       return response;
     } else {
       return NextResponse.json(
-        { 
-          success: false, 
-          message: result.message 
+        {
+          success: false,
+          message: result.message,
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
-
   } catch (error) {
-    console.error('Error en /api/auth/login:', error);
+    console.error("Error en /api/auth/login:", error);
     return NextResponse.json(
-      { 
-        success: false, 
-        message: 'Error interno del servidor' 
+      {
+        success: false,
+        message: "Error interno del servidor",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

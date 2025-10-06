@@ -232,9 +232,10 @@ const suplenciasColumns: ColumnDef<Suplencia>[] = [
 ];
 
 export default function SuplenciasPage() {
-  const [data, setData] = React.useState(() => suplenciasData);
+  const [data, setData] = React.useState<Suplencia[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [searchTerm, setSearchTerm] = React.useState("");
-  const [filteredData, setFilteredData] = React.useState(() => suplenciasData);
+  const [filteredData, setFilteredData] = React.useState<Suplencia[]>([]);
   
   // Función para normalizar texto quitando acentos
   const normalizeText = (text: string) => {
@@ -243,6 +244,11 @@ export default function SuplenciasPage() {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, ""); // Remueve diacríticos (acentos)
   };
+
+  // Cargar datos de la API
+  React.useEffect(() => {
+    fetchSuplencias();
+  }, []);
   
   // Filtrar datos cuando cambie el término de búsqueda
   React.useEffect(() => {
@@ -258,12 +264,68 @@ export default function SuplenciasPage() {
     setFilteredData(filtered);
   }, [data, searchTerm]);
 
+  const fetchSuplencias = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/suplencias");
+      
+      if (response.ok) {
+        const apiData = await response.json();
+        console.log("Datos de la API:", apiData);
+        
+        // Transformar los datos de la API al formato que necesita la tabla
+        const transformedData: Suplencia[] = apiData.map((item: any) => ({
+          id: item.id_suplencia,
+          dni: item.dni,
+          nombre_completo: item.nombre_completo,
+          establecimiento: item.establecimiento,
+          cargo: item.cargo,
+          radio: item.radio || "N/A",
+          fecha_inicio: item.fecha_inicio,
+          fecha_baja: item.fecha_baja,
+          primera_titularizacion: item.primera_titularizacion,
+          segunda_titularizacion: item.segunda_titularizacion,
+          status: getStatusFromData(item)
+        }));
+        
+        setData(transformedData);
+      } else {
+        console.error("Error al cargar suplencias");
+        // Fallback a datos de ejemplo
+        setData(suplenciasData);
+      }
+    } catch (error) {
+      console.error("Error en fetch:", error);
+      // Fallback a datos de ejemplo
+      setData(suplenciasData);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusFromData = (item: any): Suplencia["status"] => {
+    if (item.fecha_baja) return "Finalizada";
+    if (item.segunda_titularizacion) return "2° Titularización";
+    if (item.primera_titularizacion) return "1° Titularización";
+    return "Activa";
+  };
+
   const columns = withDndColumn(suplenciasColumns);
   const table = useDataTableInstance({ 
     data: filteredData, 
     columns, 
     getRowId: (row) => row.id.toString() 
   });
+
+  if (loading) {
+    return (
+      <div className="@container/main flex flex-col gap-4 md:gap-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-lg">Cargando suplencias...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">

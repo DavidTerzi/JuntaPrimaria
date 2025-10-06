@@ -11,13 +11,13 @@ export async function GET(request: NextRequest) {
     const query = `
       SELECT 
         s.id_suplencia,
-        p.numero_documento as dni,
-        CONCAT(p.nombre, ' ', p.apellido) as nombre_completo,
-        p.nombre,
-        p.apellido,
-        ue.nombre as establecimiento,
-        dc.denominacion as cargo,
-        ue.radio,
+        COALESCE(p.numero_documento, CONCAT('DOC', s.id_persona)) as dni,
+        COALESCE(CONCAT(p.nombre, ' ', p.apellido), CONCAT('Persona ', s.id_persona)) as nombre_completo,
+        COALESCE(p.nombre, 'Sin Nombre') as nombre,
+        COALESCE(p.apellido, 'Sin Apellido') as apellido,
+        COALESCE(ue.nombre, CONCAT('Establecimiento CUE-', s.cue)) as establecimiento,
+        COALESCE(dc.denominacion, CONCAT('Cargo ', s.id_cargo)) as cargo,
+        COALESCE(ue.radio, 'I') as radio,
         s.fecha_inicio,
         s.fecha_baja,
         s.primera_titularizacion,
@@ -25,14 +25,15 @@ export async function GET(request: NextRequest) {
         s.observaciones,
         s.activo,
         COALESCE(dep.nombre, 'N/A') as departamento,
-        COALESCE(ue.nivel_educativo, 'N/A') as nivel_educativo,
-        COALESCE(ue.ambito, 'N/A') as ambito,
-        COALESCE(ue.turno, 'N/A') as turno
+        COALESCE(ue.nivel_educativo, 'Primario') as nivel_educativo,
+        COALESCE(ue.ambito, 'Urbano') as ambito,
+        COALESCE(ue.turno, 'Mañana') as turno
       FROM suplencias s
-      INNER JOIN personas p ON s.id_persona = p.id_persona
-      INNER JOIN unidades_educativas ue ON s.cue = ue.cue
-      INNER JOIN denominaciondecargos dc ON s.id_cargo = dc.id_cargo
+      LEFT JOIN personas p ON s.id_persona = p.id_persona
+      LEFT JOIN unidades_educativas ue ON s.cue = ue.cue
+      LEFT JOIN denominaciondecargos dc ON s.id_cargo = dc.id_cargo
       LEFT JOIN departamentos dep ON ue.id_departamento = dep.id_departamento
+      WHERE s.activo = 1
       ORDER BY s.fecha_inicio DESC
     `;
 

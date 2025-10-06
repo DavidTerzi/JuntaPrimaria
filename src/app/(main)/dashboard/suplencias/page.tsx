@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useSearchParams } from "next/navigation";
 import { Plus, CircleCheck, Loader, EllipsisVertical } from "lucide-react";
 import { toast } from "sonner";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -232,9 +233,12 @@ const suplenciasColumns: ColumnDef<Suplencia>[] = [
 ];
 
 export default function SuplenciasPage() {
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("search") || "";
+  
   const [data, setData] = React.useState<Suplencia[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [searchTerm, setSearchTerm] = React.useState("");
+  const [searchTerm, setSearchTerm] = React.useState(initialSearch);
   const [filteredData, setFilteredData] = React.useState<Suplencia[]>([]);
   
   // Función para normalizar texto quitando acentos

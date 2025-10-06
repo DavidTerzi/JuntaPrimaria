@@ -105,7 +105,7 @@ export default function ConfiguracionPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <Label>Modo Oscuro</Label>
-                  <p className="text-sm text-muted-foreground">Activar tema oscuro</p>
+                  <p className="text-muted-foreground text-sm">Activar tema oscuro</p>
                 </div>
                 <Switch />
               </div>
@@ -149,7 +149,7 @@ export default function ConfiguracionPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <Label>Notificaciones por Email</Label>
-                  <p className="text-sm text-muted-foreground">Recibir actualizaciones por correo</p>
+                  <p className="text-muted-foreground text-sm">Recibir actualizaciones por correo</p>
                 </div>
                 <Switch defaultChecked />
               </div>

@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { authMiddleware } from "./middleware/auth-middleware";
 
 export function middleware(req: NextRequest) {
-  console.log('🔒 Middleware ejecutándose para:', req.nextUrl.pathname);
-  
+  console.log("🔒 Middleware ejecutándose para:", req.nextUrl.pathname);
+
   // Ejecutar middleware de autenticación
   const response = authMiddleware(req);
   if (response) {
@@ -22,6 +22,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };

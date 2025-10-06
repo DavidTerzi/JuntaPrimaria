@@ -24,24 +24,20 @@ export function UsuarioTab() {
             <User className="h-5 w-5" />
             <span>Información del Perfil</span>
           </CardTitle>
-          <CardDescription>
-            Gestiona tu información personal y foto de perfil
-          </CardDescription>
+          <CardDescription>Gestiona tu información personal y foto de perfil</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Foto de Perfil */}
           <div className="flex items-center space-x-6">
             <div className="flex-shrink-0">
-              <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-red-500 text-2xl font-bold text-white">
                 SDS
               </div>
             </div>
             <div className="flex-1 space-y-2">
               <div>
                 <Label className="text-sm font-medium">Actualiza tu Foto de perfil</Label>
-                <p className="text-xs text-muted-foreground">
-                  Formatos soportados: JPG, PNG, GIF (máx. 5MB)
-                </p>
+                <p className="text-muted-foreground text-xs">Formatos soportados: JPG, PNG, GIF (máx. 5MB)</p>
               </div>
               <Button variant="outline" size="sm" className="flex items-center space-x-2">
                 <Upload className="h-4 w-4" />
@@ -56,30 +52,17 @@ export function UsuarioTab() {
           <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
               <Label htmlFor="nombre">Nombre Completo</Label>
-              <Input
-                id="nombre"
-                defaultValue="Superadministrador del Sistema"
-                className="max-w-md"
-              />
+              <Input id="nombre" defaultValue="Superadministrador del Sistema" className="max-w-md" />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="email">Correo Electrónico</Label>
-              <Input
-                id="email"
-                type="email"
-                defaultValue="admin@fiestadelsol.com"
-                className="max-w-md"
-              />
+              <Input id="email" type="email" defaultValue="admin@fiestadelsol.com" className="max-w-md" />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="telefono">Teléfono</Label>
-              <Input
-                id="telefono"
-                defaultValue="+54 9 xxx xxx xxx"
-                className="max-w-md"
-              />
+              <Input id="telefono" defaultValue="+54 9 xxx xxx xxx" className="max-w-md" />
             </div>
           </div>
         </CardContent>
@@ -97,27 +80,17 @@ export function UsuarioTab() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label className="text-base">Notificaciones por Email</Label>
-              <p className="text-sm text-muted-foreground">
-                Recibe actualizaciones por correo
-              </p>
+              <p className="text-muted-foreground text-sm">Recibe actualizaciones por correo</p>
             </div>
-            <Switch
-              checked={notificacionesEmail}
-              onCheckedChange={setNotificacionesEmail}
-            />
+            <Switch checked={notificacionesEmail} onCheckedChange={setNotificacionesEmail} />
           </div>
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label className="text-base">Notificaciones Push</Label>
-              <p className="text-sm text-muted-foreground">
-                Notificaciones en el navegador
-              </p>
+              <p className="text-muted-foreground text-sm">Notificaciones en el navegador</p>
             </div>
-            <Switch
-              checked={notificacionesPush}
-              onCheckedChange={setNotificacionesPush}
-            />
+            <Switch checked={notificacionesPush} onCheckedChange={setNotificacionesPush} />
           </div>
         </CardContent>
       </Card>

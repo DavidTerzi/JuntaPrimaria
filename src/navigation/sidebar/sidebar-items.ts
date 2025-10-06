@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   ChartBar,
   Banknote,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 
@@ -55,6 +56,17 @@ export const sidebarItems: NavGroup[] = [
   },
   {
     id: 2,
+    label: "Gestión Educativa",
+    items: [
+      {
+        title: "Suplencias",
+        url: "/dashboard/suplencias",
+        icon: Users,
+      },
+    ],
+  },
+  {
+    id: 3,
     label: "Pages",
     items: [
       {

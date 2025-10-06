@@ -1,5 +1,6 @@
 import {
   Home,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 
@@ -36,6 +37,17 @@ export const sidebarItems: NavGroup[] = [
         title: "Inicio",
         url: "/dashboard",
         icon: Home,
+      },
+    ],
+  },
+  {
+    id: 2,
+    label: "Gestión Educativa",
+    items: [
+      {
+        title: "Suplencias",
+        url: "/dashboard/suplencias",
+        icon: Users,
       },
     ],
   },

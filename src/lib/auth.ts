@@ -1,10 +1,10 @@
 // lib/auth.ts
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { executeQuery, Usuario, UsuarioCompleto } from './db';
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { executeQuery, Usuario, UsuarioCompleto } from "./db";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-key";
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "3h";
 
 export interface LoginCredentials {
   username: string;
@@ -22,7 +22,7 @@ export interface AuthResponse {
 export async function validateLogin(credentials: LoginCredentials): Promise<AuthResponse> {
   try {
     // Buscar usuario por username o email
-    const users = await executeQuery(
+    const users = (await executeQuery(
       `SELECT 
         u.id, u.username, u.email, u.password_hash, u.nombre, u.apellido, 
         u.documento, u.telefono, u.rol_id, u.activo, u.ultimo_login,
@@ -31,13 +31,13 @@ export async function validateLogin(credentials: LoginCredentials): Promise<Auth
       FROM usuarios u
       INNER JOIN roles r ON u.rol_id = r.id
       WHERE (u.username = ? OR u.email = ?) AND u.activo = 1`,
-      [credentials.username, credentials.username]
-    ) as UsuarioCompleto[];
+      [credentials.username, credentials.username],
+    )) as UsuarioCompleto[];
 
     if (users.length === 0) {
       return {
         success: false,
-        message: 'Usuario no encontrado o inactivo'
+        message: "Usuario no encontrado o inactivo",
       };
     }
 
@@ -45,19 +45,16 @@ export async function validateLogin(credentials: LoginCredentials): Promise<Auth
 
     // Verificar password
     const isValidPassword = await bcrypt.compare(credentials.password, user.password_hash);
-    
+
     if (!isValidPassword) {
       return {
         success: false,
-        message: 'Contraseña incorrecta'
+        message: "Contraseña incorrecta",
       };
     }
 
     // Actualizar último login
-    await executeQuery(
-      'UPDATE usuarios SET ultimo_login = CURRENT_TIMESTAMP WHERE id = ?',
-      [user.id]
-    );
+    await executeQuery("UPDATE usuarios SET ultimo_login = CURRENT_TIMESTAMP WHERE id = ?", [user.id]);
 
     // Generar token JWT
     const token = jwt.sign(
@@ -65,10 +62,10 @@ export async function validateLogin(credentials: LoginCredentials): Promise<Auth
         id: user.id,
         username: user.username,
         email: user.email,
-        rol: user.rol_nombre
+        rol: user.rol_nombre,
       },
       JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN }
+      { expiresIn: JWT_EXPIRES_IN },
     );
 
     // Remover password_hash de la respuesta
@@ -76,16 +73,15 @@ export async function validateLogin(credentials: LoginCredentials): Promise<Auth
 
     return {
       success: true,
-      message: 'Login exitoso',
+      message: "Login exitoso",
       user: userWithoutPassword as UsuarioCompleto,
-      token
+      token,
     };
-
   } catch (error) {
-    console.error('Error en validateLogin:', error);
+    console.error("Error en validateLogin:", error);
     return {
       success: false,
-      message: 'Error interno del servidor'
+      message: "Error interno del servidor",
     };
   }
 }
@@ -108,7 +104,7 @@ export async function hashPassword(password: string): Promise<string> {
 // Función para obtener usuario por ID
 export async function getUserById(id: number): Promise<UsuarioCompleto | null> {
   try {
-    const users = await executeQuery(
+    const users = (await executeQuery(
       `SELECT 
         u.id, u.username, u.email, u.nombre, u.apellido, 
         u.documento, u.telefono, u.rol_id, u.activo, u.ultimo_login,
@@ -117,12 +113,12 @@ export async function getUserById(id: number): Promise<UsuarioCompleto | null> {
       FROM usuarios u
       INNER JOIN roles r ON u.rol_id = r.id
       WHERE u.id = ? AND u.activo = 1`,
-      [id]
-    ) as UsuarioCompleto[];
+      [id],
+    )) as UsuarioCompleto[];
 
     return users.length > 0 ? users[0] : null;
   } catch (error) {
-    console.error('Error en getUserById:', error);
+    console.error("Error en getUserById:", error);
     return null;
   }
 }
@@ -140,15 +136,15 @@ export async function createUser(userData: {
 }): Promise<AuthResponse> {
   try {
     // Verificar si el usuario ya existe
-    const existingUsers = await executeQuery(
-      'SELECT id FROM usuarios WHERE username = ? OR email = ?',
-      [userData.username, userData.email]
-    ) as any[];
+    const existingUsers = (await executeQuery("SELECT id FROM usuarios WHERE username = ? OR email = ?", [
+      userData.username,
+      userData.email,
+    ])) as any[];
 
     if (existingUsers.length > 0) {
       return {
         success: false,
-        message: 'El usuario o email ya existe'
+        message: "El usuario o email ya existe",
       };
     }
 
@@ -156,7 +152,7 @@ export async function createUser(userData: {
     const passwordHash = await hashPassword(userData.password);
 
     // Insertar nuevo usuario
-    const result = await executeQuery(
+    const result = (await executeQuery(
       `INSERT INTO usuarios (username, email, password_hash, nombre, apellido, documento, telefono, rol_id)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
@@ -167,24 +163,23 @@ export async function createUser(userData: {
         userData.apellido,
         userData.documento,
         userData.telefono,
-        userData.rol_id
-      ]
-    ) as any;
+        userData.rol_id,
+      ],
+    )) as any;
 
     // Obtener el usuario recién creado
     const newUser = await getUserById(result.insertId);
 
     return {
       success: true,
-      message: 'Usuario creado exitosamente',
-      user: newUser || undefined
+      message: "Usuario creado exitosamente",
+      user: newUser || undefined,
     };
-
   } catch (error) {
-    console.error('Error en createUser:', error);
+    console.error("Error en createUser:", error);
     return {
       success: false,
-      message: 'Error al crear usuario'
+      message: "Error al crear usuario",
     };
   }
 }

@@ -259,7 +259,7 @@ export default function Page() {
               <CardDescription>Administrar y consultar información de suplencias</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex flex-col gap-4 items-start">                
+              <div className="flex flex-col items-start gap-4">
                 <Dialog open={showBuscarSuplenciaModal} onOpenChange={setShowBuscarSuplenciaModal}>
                   <DialogTrigger asChild>
                     <Button variant="outline" className="flex items-center space-x-2" size="lg">
@@ -276,12 +276,12 @@ export default function Page() {
                     </DialogHeader>
                     <div className="space-y-4">
                       <div>
-                        <Input 
+                        <Input
                           placeholder="Término de búsqueda"
                           value={buscarSuplencia}
                           onChange={(e) => setBuscarSuplencia(e.target.value)}
                           onKeyPress={(e) => {
-                            if (e.key === 'Enter' && buscarSuplencia.trim()) {
+                            if (e.key === "Enter" && buscarSuplencia.trim()) {
                               router.push(`/dashboard/suplencias?search=${encodeURIComponent(buscarSuplencia.trim())}`);
                               setShowBuscarSuplenciaModal(false);
                               setBuscarSuplencia("");
@@ -290,19 +290,24 @@ export default function Page() {
                         />
                       </div>
                       <div className="flex justify-end space-x-2">
-                        <Button variant="outline" onClick={() => {
-                          setShowBuscarSuplenciaModal(false);
-                          setBuscarSuplencia("");
-                        }}>
-                          Cancelar
-                        </Button>
-                        <Button onClick={() => {
-                          if (buscarSuplencia.trim()) {
-                            router.push(`/dashboard/suplencias?search=${encodeURIComponent(buscarSuplencia.trim())}`);
+                        <Button
+                          variant="outline"
+                          onClick={() => {
                             setShowBuscarSuplenciaModal(false);
                             setBuscarSuplencia("");
-                          }
-                        }}>
+                          }}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            if (buscarSuplencia.trim()) {
+                              router.push(`/dashboard/suplencias?search=${encodeURIComponent(buscarSuplencia.trim())}`);
+                              setShowBuscarSuplenciaModal(false);
+                              setBuscarSuplencia("");
+                            }
+                          }}
+                        >
                           Aceptar
                         </Button>
                       </div>

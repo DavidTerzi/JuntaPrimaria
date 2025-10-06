@@ -270,16 +270,7 @@ export default function Page() {
               <CardDescription>Administrar y consultar información de suplencias</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex flex-col gap-4 items-start">
-                <Button 
-                  className="flex items-center space-x-2" 
-                  size="lg"
-                  onClick={() => router.push('/dashboard/suplencias')}
-                >
-                  <UserPlus className="h-5 w-5" />
-                  <span>Cargar Suplencia</span>
-                </Button>
-                
+              <div className="flex flex-col gap-4 items-start">                
                 <Dialog open={showBuscarSuplenciaModal} onOpenChange={setShowBuscarSuplenciaModal}>
                   <DialogTrigger asChild>
                     <Button variant="outline" className="flex items-center space-x-2" size="lg">

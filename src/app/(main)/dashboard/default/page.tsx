@@ -1,131 +1,308 @@
 "use client";
 
 import { useState } from "react";
-import { Settings, Layout, User, Shield } from "lucide-react";
+import { Users, FileUser, Calendar, FileText, List, UserPlus, Search, X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export default function Page() {
-  const [activeTab, setActiveTab] = useState("general");
+  const [activeTab, setActiveTab] = useState("titulares");
+  const [showCargarForm, setShowCargarForm] = useState(false);
+  const [showBuscarModal, setShowBuscarModal] = useState(false);
+  const [buscarDni, setBuscarDni] = useState("");
 
   return (
     <div className="flex flex-1 flex-col space-y-8 p-8">
       <div className="flex items-center justify-between space-y-2">
         <div>
           <div className="flex items-center space-x-2">
-            <Settings className="h-6 w-6" />
-            <h2 className="text-3xl font-bold tracking-tight">Configuración</h2>
+            <Users className="h-6 w-6" />
+            <h2 className="text-3xl font-bold tracking-tight">Sistema de Junta Primaria</h2>
           </div>
           <p className="text-muted-foreground mt-2">
-            Gestiona la configuración del sistema y tus preferencias personales.
+            Gestión de titulares, suplencias y administración del sistema.
           </p>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="general" className="flex items-center space-x-2">
-            <Settings className="h-4 w-4" />
-            <span>General</span>
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="titulares" className="flex items-center space-x-2">
+            <Users className="h-4 w-4" />
+            <span>Titulares</span>
           </TabsTrigger>
-          <TabsTrigger value="layout" className="flex items-center space-x-2">
-            <Layout className="h-4 w-4" />
-            <span>Layout</span>
+          <TabsTrigger value="suplencias" className="flex items-center space-x-2">
+            <FileUser className="h-4 w-4" />
+            <span>Suplencias</span>
           </TabsTrigger>
-          <TabsTrigger value="usuario" className="flex items-center space-x-2">
-            <User className="h-4 w-4" />
-            <span>Usuario</span>
+          <TabsTrigger value="antiguedad" className="flex items-center space-x-2">
+            <Calendar className="h-4 w-4" />
+            <span>Antigüedad para Traslado</span>
           </TabsTrigger>
-          <TabsTrigger value="seguridad" className="flex items-center space-x-2">
-            <Shield className="h-4 w-4" />
-            <span>Seguridad</span>
+          <TabsTrigger value="planillas" className="flex items-center space-x-2">
+            <FileText className="h-4 w-4" />
+            <span>Impresión de Planillas</span>
+          </TabsTrigger>
+          <TabsTrigger value="listado" className="flex items-center space-x-2">
+            <List className="h-4 w-4" />
+            <span>Generar Listado</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="general" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Información del Sistema</CardTitle>
-              <CardDescription>Configuración básica del sistema</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="nombre">Nombre del Sistema</Label>
-                  <Input id="nombre" defaultValue="Sistema de Junta Primaria de San Juan" />
+        <TabsContent value="titulares" className="space-y-4">
+          {!showCargarForm ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Gestión de Titulares</CardTitle>
+                <CardDescription>Administrar y consultar información de titulares</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-col gap-4 items-start">
+                  <Button 
+                    className="flex items-center space-x-2" 
+                    size="lg"
+                    onClick={() => setShowCargarForm(true)}
+                  >
+                    <UserPlus className="h-5 w-5" />
+                    <span>Cargar Titular</span>
+                  </Button>
+                  
+                  <Dialog open={showBuscarModal} onOpenChange={setShowBuscarModal}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="flex items-center space-x-2" size="lg">
+                        <Search className="h-5 w-5" />
+                        <span>Buscar Titular</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Introducir el valor del parámetro</DialogTitle>
+                        <DialogDescription>
+                          Ingrese N° DNI
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div>
+                          <Input 
+                            placeholder="N° DNI"
+                            value={buscarDni}
+                            onChange={(e) => setBuscarDni(e.target.value)}
+                          />
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <Button variant="outline" onClick={() => setShowBuscarModal(false)}>
+                            Cancelar
+                          </Button>
+                          <Button onClick={() => {
+                            // TODO: Aquí se agregará la lógica de búsqueda cuando tengamos la base de datos
+                            console.log("Buscando DNI:", buscarDni);
+                            setShowBuscarModal(false);
+                            setBuscarDni(""); // Limpiar el campo
+                          }}>
+                            Aceptar
+                          </Button>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </div>
-                <div>
-                  <Label htmlFor="version">Versión</Label>
-                  <Input id="version" defaultValue="2.0.0" disabled />
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Cargar Antigüedad Titular</CardTitle>
+                    <CardDescription>Complete todos los campos requeridos</CardDescription>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowCargarForm(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="dni">N° D.N.I.:</Label>
+                    <Input id="dni" placeholder="Ingrese DNI" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="apellido">Apellido:</Label>
+                    <Input id="apellido" placeholder="Ingrese apellido" />
+                  </div>
+                </div>
 
-        <TabsContent value="layout" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Configuración de Tema</CardTitle>
-              <CardDescription>Personaliza la apariencia del sistema</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label>Modo Oscuro</Label>
-                  <p className="text-sm text-muted-foreground">Activar tema oscuro</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="nombre">Nombre:</Label>
+                    <Input id="nombre" placeholder="Ingrese nombre" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cargo">Denominación del Cargo:</Label>
+                    <Input id="cargo" placeholder="Ingrese denominación del cargo" />
+                  </div>
                 </div>
-                <Switch />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
-        <TabsContent value="usuario" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Información del Perfil</CardTitle>
-              <CardDescription>Gestiona tu información personal</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fecha-titularizacion">Fecha de Titularización:</Label>
+                    <Input id="fecha-titularizacion" type="date" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fecha-traslado">Fecha de Traslado-Baja:</Label>
+                    <Input id="fecha-traslado" type="date" />
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="nombre-usuario">Nombre Completo</Label>
-                  <Input id="nombre-usuario" defaultValue="Administrator" />
+                  <Label htmlFor="establecimiento">Establecimiento:</Label>
+                  <Input id="establecimiento" placeholder="Ingrese establecimiento" />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email-usuario">Correo Electrónico</Label>
-                  <Input id="email-usuario" type="email" defaultValue="admin@sanjuan.gov.ar" />
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium bg-gray-100 p-2 rounded">
+                    Datos para conformar el Listado de Traslado
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="tipo-traslado">Tipo de Traslado:</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccione tipo de traslado" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="regular">Regular</SelectItem>
+                          <SelectItem value="especial">Especial</SelectItem>
+                          <SelectItem value="por-necesidad">Por Necesidad</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="establecimiento-traslado">Establecimiento del que se traslada:</Label>
+                      <Input id="establecimiento-traslado" placeholder="Ingrese establecimiento" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="categoria">Categoría:</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccione" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="a">A</SelectItem>
+                          <SelectItem value="b">B</SelectItem>
+                          <SelectItem value="c">C</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="turno">Turno:</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccione" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="mañana">Mañana</SelectItem>
+                          <SelectItem value="tarde">Tarde</SelectItem>
+                          <SelectItem value="vespertino">Vespertino</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="radio">Radio:</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccione" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="urbano">Urbano</SelectItem>
+                          <SelectItem value="rural">Rural</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="observaciones">Observaciones:</Label>
+                    <Textarea 
+                      id="observaciones" 
+                      placeholder="Ingrese observaciones"
+                      rows={4}
+                    />
+                  </div>
                 </div>
-              </div>
+
+                <div className="flex justify-center space-x-4 pt-4">
+                  <Button className="bg-blue-500 hover:bg-blue-600">
+                    Licencias
+                  </Button>
+                  <Button className="bg-blue-500 hover:bg-blue-600">
+                    Cargar Suplencias
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="suplencias" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Gestión de Suplencias</CardTitle>
+              <CardDescription>Administrar suplencias y reemplazos</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">Contenido de suplencias - En desarrollo</p>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="seguridad" className="space-y-4">
+        <TabsContent value="antiguedad" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Cambiar Contraseña</CardTitle>
-              <CardDescription>Actualiza tu contraseña de acceso</CardDescription>
+              <CardTitle>Antigüedad para Traslado</CardTitle>
+              <CardDescription>Consultar y gestionar antigüedad para traslados</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="current-password">Contraseña Actual</Label>
-                <Input id="current-password" type="password" />
-              </div>
-              <div>
-                <Label htmlFor="new-password">Nueva Contraseña</Label>
-                <Input id="new-password" type="password" />
-              </div>
-              <div>
-                <Label htmlFor="confirm-password">Confirmar Contraseña</Label>
-                <Input id="confirm-password" type="password" />
-              </div>
-              <Button>Cambiar Contraseña</Button>
+              <p className="text-muted-foreground">Contenido de antigüedad - En desarrollo</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="planillas" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Impresión de Planillas</CardTitle>
+              <CardDescription>Generar e imprimir planillas del sistema</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">Contenido de planillas - En desarrollo</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="listado" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Generar Listado</CardTitle>
+              <CardDescription>Crear y exportar listados del sistema</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">Contenido de listados - En desarrollo</p>
             </CardContent>
           </Card>
         </TabsContent>

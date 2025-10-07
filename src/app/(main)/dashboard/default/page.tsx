@@ -616,6 +616,52 @@ export default function Page() {
     setSuplenciasActivas(0);
   };
 
+  // Estados para búsqueda de suplencias
+  const [datosSuplente, setDatosSuplente] = useState<any>(null);
+  const [suplenciasHistorial, setSuplenciasHistorial] = useState<any[]>([]);
+  const [cargandoBusquedaSuplencia, setCargandoBusquedaSuplencia] = useState(false);
+  const [mensajeBusquedaSuplencia, setMensajeBusquedaSuplencia] = useState("");
+
+  // Función para buscar suplencias por DNI
+  const buscarSuplenciasPorDni = async () => {
+    if (!buscarSuplencia.trim()) {
+      setMensajeBusquedaSuplencia("Por favor ingrese un DNI o nombre");
+      return;
+    }
+
+    setCargandoBusquedaSuplencia(true);
+    setMensajeBusquedaSuplencia("");
+
+    try {
+      const response = await fetch(`/api/suplencias?search=${encodeURIComponent(buscarSuplencia.trim())}`);
+      const data = await response.json();
+
+      if (Array.isArray(data) && data.length > 0) {
+        // Usar el primer resultado como datos del suplente
+        setDatosSuplente({
+          numero_documento: data[0].dni,
+          nombre: data[0].nombre,
+          apellido: data[0].apellido,
+          nombre_completo: data[0].nombre_completo
+        });
+        setSuplenciasHistorial(data);
+        setMensajeBusquedaSuplencia(`Se encontraron ${data.length} suplencia(s)`);
+      } else {
+        setDatosSuplente(null);
+        setSuplenciasHistorial([]);
+        setMensajeBusquedaSuplencia("No se encontraron suplencias para este criterio");
+      }
+    } catch (error) {
+      console.error('Error al buscar suplencias:', error);
+      setDatosSuplente(null);
+      setSuplenciasHistorial([]);
+      setMensajeBusquedaSuplencia("Error al realizar la búsqueda");
+    } finally {
+      setCargandoBusquedaSuplencia(false);
+      setShowBuscarSuplenciaModal(false);
+    }
+  };
+
   return (
     <div className="flex flex-1 flex-col space-y-8 p-8">
       <div className="flex items-center justify-between space-y-2">
@@ -1145,17 +1191,165 @@ export default function Page() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-col items-start gap-4">
-                <Button variant="outline" className="flex items-center space-x-2" size="lg">
-                  <Search className="h-5 w-5" />
-                  <span>Buscar Suplencia</span>
-                </Button>
+                <Dialog open={showBuscarSuplenciaModal} onOpenChange={setShowBuscarSuplenciaModal}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="flex items-center space-x-2" size="lg">
+                      <Search className="h-5 w-5" />
+                      <span>Buscar Suplencia</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Buscar Suplencia</DialogTitle>
+                      <DialogDescription>
+                        Ingrese el DNI o nombre de la persona para buscar su suplencia
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="buscar-suplencia">DNI o Nombre</Label>
+                        <Input
+                          id="buscar-suplencia"
+                          placeholder="Ej: 12345678 o Juan Pérez"
+                          value={buscarSuplencia}
+                          onChange={(e) => setBuscarSuplencia(e.target.value)}
+                        />
+                      </div>
+                      <div className="flex justify-end space-x-2">
+                        <Button variant="outline" onClick={() => {
+                          setShowBuscarSuplenciaModal(false);
+                          setBuscarSuplencia("");
+                          setMensajeBusquedaSuplencia("");
+                          setDatosSuplente(null);
+                          setSuplenciasHistorial([]);
+                        }}>
+                          Cancelar
+                        </Button>
+                        <Button 
+                          onClick={buscarSuplenciasPorDni}
+                          disabled={cargandoBusquedaSuplencia}
+                        >
+                          <Search className="h-4 w-4 mr-2" />
+                          {cargandoBusquedaSuplencia ? "Buscando..." : "Buscar"}
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
+
+              {/* Mostrar mensaje de búsqueda de suplencias */}
+              {mensajeBusquedaSuplencia && (
+                <div className="mt-4">
+                  <p className="text-sm text-muted-foreground">{mensajeBusquedaSuplencia}</p>
+                </div>
+              )}
+
+              {/* Mostrar resultados de búsqueda de suplencias */}
+              {datosSuplente && (
+                <Card className="mt-6">
+                  <CardHeader>
+                    <CardTitle>Historial de Suplencias</CardTitle>
+                    <CardDescription>
+                      Información de suplencias del docente
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {/* Información del suplente */}
+                    <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                          <span className="font-medium text-gray-600">Numero Documento:</span>
+                          <div className="font-semibold">{datosSuplente.numero_documento}</div>
+                        </div>
+                        <div>
+                          <span className="font-medium text-gray-600">Apellido:</span>
+                          <div className="font-semibold">{datosSuplente.apellido}</div>
+                        </div>
+                        <div>
+                          <span className="font-medium text-gray-600">Nombre:</span>
+                          <div className="font-semibold">{datosSuplente.nombre}</div>
+                        </div>
+                        <div>
+                          <span className="font-medium text-gray-600">Establecimiento:</span>
+                          <div className="font-semibold">{suplenciasHistorial[0]?.establecimiento || 'N/A'}</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-gray-800 text-white">
+                          <TableHead className="font-semibold text-white">Fecha de Inicio</TableHead>
+                          <TableHead className="font-semibold text-white">Fecha de Baja</TableHead>
+                          <TableHead className="font-semibold text-white">Establecimiento</TableHead>
+                          <TableHead className="font-semibold text-white">Cargo</TableHead>
+                          <TableHead className="font-semibold text-white">Radio</TableHead>
+                          <TableHead className="font-semibold text-white">1° Titularización</TableHead>
+                          <TableHead className="font-semibold text-white">2° Titularización</TableHead>
+                          <TableHead className="font-semibold text-white">Observaciones</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {suplenciasHistorial.map((suplencia: any, index) => (
+                          <TableRow key={index} className="hover:bg-gray-50">
+                            <TableCell className="text-sm">
+                              {suplencia.fecha_inicio ? 
+                                new Date(suplencia.fecha_inicio).toLocaleDateString('es-ES', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric'
+                                }) : 
+                                'N/A'
+                              }
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {suplencia.fecha_baja ? 
+                                new Date(suplencia.fecha_baja).toLocaleDateString('es-ES', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric'
+                                }) : 
+                                'Activa'
+                              }
+                            </TableCell>
+                            <TableCell className="text-sm font-medium">{suplencia.establecimiento || 'N/A'}</TableCell>
+                            <TableCell className="text-sm">{suplencia.cargo || 'N/A'}</TableCell>
+                            <TableCell className="text-sm text-center">{suplencia.radio || 'N/A'}</TableCell>
+                            <TableCell className="text-sm">
+                              {suplencia.primera_titularizacion ? 
+                                new Date(suplencia.primera_titularizacion).toLocaleDateString('es-ES', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric'
+                                }) : 
+                                '-'
+                              }
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {suplencia.segunda_titularizacion ? 
+                                new Date(suplencia.segunda_titularizacion).toLocaleDateString('es-ES', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric'
+                                }) : 
+                                '-'
+                              }
+                            </TableCell>
+                            <TableCell className="text-sm">{suplencia.observaciones || '-'}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="antiguedad" className="space-y-4">
-          <CalculoAntiguedad onClose={() => setActiveTab("titulares")} />
+          <CalculoAntiguedad />
         </TabsContent>
 
         <TabsContent value="planillas" className="space-y-4">

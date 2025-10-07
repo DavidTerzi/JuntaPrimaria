@@ -8,36 +8,41 @@ export async function GET(request: NextRequest) {
     const testResult = await executeQuery(testQuery);
     console.log('Test query result:', testResult);
     
+    // Query con JOINs seguros y valores por defecto
     const query = `
       SELECT 
         s.id_suplencia,
-        COALESCE(p.numero_documento, CONCAT('DOC', s.id_persona)) as dni,
-        COALESCE(CONCAT(p.nombre, ' ', p.apellido), CONCAT('Persona ', s.id_persona)) as nombre_completo,
-        COALESCE(p.nombre, 'Sin Nombre') as nombre,
-        COALESCE(p.apellido, 'Sin Apellido') as apellido,
-        COALESCE(ue.nombre, CONCAT('Establecimiento CUE-', s.cue)) as establecimiento,
-        COALESCE(dc.denominacion, CONCAT('Cargo ', s.id_cargo)) as cargo,
-        COALESCE(ue.radio, 'I') as radio,
+        s.id_persona,
+        s.cue,
+        s.id_cargo,
         s.fecha_inicio,
         s.fecha_baja,
         s.primera_titularizacion,
         s.segunda_titularizacion,
         s.observaciones,
         s.activo,
-        COALESCE(dep.nombre, 'N/A') as departamento,
+        COALESCE(p.numero_documento, CONCAT('DOC-', s.id_persona)) as dni,
+        CONCAT(COALESCE(p.nombre, 'Persona'), ' ', COALESCE(p.apellido, CONCAT('ID-', s.id_persona))) as nombre_completo,
+        COALESCE(p.nombre, 'Sin Nombre') as nombre,
+        COALESCE(p.apellido, 'Sin Apellido') as apellido,
+        COALESCE(ue.nombre, CONCAT('Establecimiento CUE-', s.cue)) as establecimiento,
+        COALESCE(ue.radio, 'I') as radio,
         COALESCE(ue.nivel_educativo, 'Primario') as nivel_educativo,
         COALESCE(ue.ambito, 'Urbano') as ambito,
-        COALESCE(ue.turno, 'Mañana') as turno
+        COALESCE(ue.turno, 'Mañana') as turno,
+        COALESCE(dc.denominacion, CONCAT('Cargo ID-', s.id_cargo)) as cargo,
+        COALESCE(dep.nombre, 'Departamento N/A') as departamento
       FROM suplencias s
-      LEFT JOIN personas p ON s.id_persona = p.id_persona
-      LEFT JOIN unidades_educativas ue ON s.cue = ue.cue
-      LEFT JOIN denominaciondecargos dc ON s.id_cargo = dc.id_cargo
-      LEFT JOIN departamentos dep ON ue.id_departamento = dep.id_departamento
+      LEFT JOIN personas p ON CAST(s.id_persona AS CHAR) = CAST(p.id_persona AS CHAR)
+      LEFT JOIN unidades_educativas ue ON CAST(s.cue AS CHAR) = CAST(ue.cue AS CHAR)
+      LEFT JOIN denominaciondecargos dc ON CAST(s.id_cargo AS CHAR) = CAST(dc.id_cargo AS CHAR)
+      LEFT JOIN departamentos dep ON CAST(ue.id_departamento AS CHAR) = CAST(dep.id_departamento AS CHAR)
       WHERE s.activo = 1
       ORDER BY s.fecha_inicio DESC
+      LIMIT 100
     `;
 
-    const suplencias = await executeQuery(query);
+    const suplencias = await executeQuery(query) as any[];
     console.log('Suplencias query result:', suplencias);
 
     return NextResponse.json(suplencias, { status: 200 });

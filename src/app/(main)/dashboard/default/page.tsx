@@ -24,11 +24,12 @@ export default function Page() {
   const [buscarDni, setBuscarDni] = useState("");
   
   // Estados para búsqueda de titulares
-  const [resultadosBusqueda, setResultadosBusqueda] = useState([]);
+  const [datosDocente, setDatosDocente] = useState<any>(null);
+  const [establecimientosHistorial, setEstablecimientosHistorial] = useState([]);
   const [cargandoBusqueda, setCargandoBusqueda] = useState(false);
   const [mensajeBusqueda, setMensajeBusqueda] = useState("");
 
-  // Función para buscar persona por DNI
+  // Función para buscar persona por DNI y su historial de establecimientos
   const buscarPersonaPorDni = async () => {
     if (!buscarDni.trim()) {
       setMensajeBusqueda("Por favor ingrese un DNI");
@@ -39,7 +40,7 @@ export default function Page() {
     setMensajeBusqueda("");
 
     try {
-      const response = await fetch('/api/personas/search', {
+      const response = await fetch('/api/personas/establecimientos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,15 +51,18 @@ export default function Page() {
       const data = await response.json();
 
       if (data.success) {
-        setResultadosBusqueda(data.data);
-        setMensajeBusqueda(`Se encontraron ${data.data.length} resultado(s)`);
+        setDatosDocente(data.data.persona);
+        setEstablecimientosHistorial(data.data.establecimientos);
+        setMensajeBusqueda(`Se encontraron ${data.data.establecimientos.length} establecimiento(s)`);
       } else {
-        setResultadosBusqueda([]);
+        setDatosDocente(null);
+        setEstablecimientosHistorial([]);
         setMensajeBusqueda(data.message || "No se encontraron resultados");
       }
     } catch (error) {
       console.error('Error al buscar:', error);
-      setResultadosBusqueda([]);
+      setDatosDocente(null);
+      setEstablecimientosHistorial([]);
       setMensajeBusqueda("Error al realizar la búsqueda");
     } finally {
       setCargandoBusqueda(false);
@@ -219,7 +223,8 @@ export default function Page() {
                             setShowBuscarModal(false);
                             setBuscarDni("");
                             setMensajeBusqueda("");
-                            setResultadosBusqueda([]);
+                            setDatosDocente(null);
+                            setEstablecimientosHistorial([]);
                           }}>
                             Cancelar
                           </Button>
@@ -243,76 +248,74 @@ export default function Page() {
                 )}
 
                 {/* Mostrar resultados de búsqueda */}
-                {resultadosBusqueda.length > 0 && (
+                {datosDocente && (
                   <Card className="mt-6">
                     <CardHeader>
-                      <CardTitle>Resultados de Búsqueda</CardTitle>
+                      <CardTitle>Establecimientos donde el docente es o fue Titular</CardTitle>
                       <CardDescription>
-                        Personas encontradas con el DNI consultado
+                        Historial de establecimientos y movimientos del docente
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
+                      {/* Información del docente */}
+                      <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <span className="font-medium text-gray-600">Numero Documento:</span>
+                            <div className="font-semibold">{datosDocente.numero_documento}</div>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-600">Apellido:</span>
+                            <div className="font-semibold">{datosDocente.apellido}</div>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-600">Nombre:</span>
+                            <div className="font-semibold">{datosDocente.nombre}</div>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-600">Denominacion del Cargo:</span>
+                            <div className="font-semibold">{datosDocente.cargo || 'Maestro de Especialidades - Nivel Inicial y/o Primario - MUSICA'}</div>
+                          </div>
+                        </div>
+                      </div>
+                      
                       <Table>
                         <TableHeader>
-                          <TableRow className="bg-gray-50">
-                            <TableHead className="font-semibold">Personal</TableHead>
-                            <TableHead className="font-semibold">Función</TableHead>
-                            <TableHead className="font-semibold">Tipo</TableHead>
-                            <TableHead className="font-semibold">Fecha y Hora</TableHead>
-                            <TableHead className="font-semibold">Método</TableHead>
-                            <TableHead className="font-semibold">Registrado por</TableHead>
-                            <TableHead className="font-semibold">Observaciones</TableHead>
-                            <TableHead className="font-semibold">Acciones</TableHead>
+                          <TableRow className="bg-gray-800 text-white">
+                            <TableHead className="font-semibold text-white">Fecha de Titularización</TableHead>
+                            <TableHead className="font-semibold text-white">Fecha de Traslado o Baja</TableHead>
+                            <TableHead className="font-semibold text-white">Establecimiento</TableHead>
+                            <TableHead className="font-semibold text-white">Años</TableHead>
+                            <TableHead className="font-semibold text-white">Meses</TableHead>
+                            <TableHead className="font-semibold text-white">Días</TableHead>
+                            <TableHead className="font-semibold text-white">Tipo de Traslado</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {resultadosBusqueda.map((persona: any, index) => (
-                            <TableRow key={persona.id || index} className="hover:bg-gray-50">
-                              <TableCell>
-                                <div className="flex flex-col">
-                                  <span className="font-medium text-blue-600">
-                                    {persona.nombre} {persona.apellido}
-                                  </span>
-                                  <span className="text-sm text-gray-500">DNI: {persona.dni}</span>
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                <div className="flex flex-col">
-                                  <span className="font-medium">Coordinador de Logística</span>
-                                  <span className="text-sm text-gray-500">Administrativo</span>
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                  SALIDA
-                                </span>
+                          {establecimientosHistorial.map((establecimiento: any, index) => (
+                            <TableRow key={index} className="hover:bg-gray-50">
+                              <TableCell className="text-sm">
+                                {new Date(establecimiento.fecha_titularizacion).toLocaleDateString('es-ES', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric'
+                                })}
                               </TableCell>
                               <TableCell className="text-sm">
-                                {new Date().toLocaleDateString('es-ES')} {new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                                {establecimiento.fecha_traslado_baja ? 
+                                  new Date(establecimiento.fecha_traslado_baja).toLocaleDateString('es-ES', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric'
+                                  }) : 
+                                  'Activo'
+                                }
                               </TableCell>
-                              <TableCell>
-                                <span className="inline-flex items-center">
-                                  📱 QR
-                                </span>
-                              </TableCell>
-                              <TableCell className="text-sm">
-                                Superadministrador del Sistema
-                              </TableCell>
-                              <TableCell className="text-sm text-gray-500">
-                                Registro automático p...
-                              </TableCell>
-                              <TableCell>
-                                <div className="flex space-x-1">
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                    <span className="sr-only">Editar</span>
-                                    ✏️
-                                  </Button>
-                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                    <span className="sr-only">Eliminar</span>
-                                    🗑️
-                                  </Button>
-                                </div>
-                              </TableCell>
+                              <TableCell className="text-sm font-medium">{establecimiento.establecimiento}</TableCell>
+                              <TableCell className="text-sm text-center">{establecimiento.anos}</TableCell>
+                              <TableCell className="text-sm text-center">{establecimiento.meses}</TableCell>
+                              <TableCell className="text-sm text-center">{establecimiento.dias}</TableCell>
+                              <TableCell className="text-sm">{establecimiento.tipo_traslado}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>

@@ -1,14 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
-
-// Configuración de la base de datos
-const dbConfig = {
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'junta_primaria',
-  port: 3306,
-};
+import { createConnection } from '@/lib/database';
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,13 +12,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Crear conexión a la base de datos
-    const connection = await mysql.createConnection(dbConfig);
+    // Crear conexión a la base de datos con UTF-8
+    const connection = await createConnection();
 
     try {
       // Buscar persona por DNI
       const [rows] = await connection.execute(
-        'SELECT * FROM personas WHERE dni = ?',
+        'SELECT * FROM personas WHERE numero_documento = ?',
         [dni]
       );
 

@@ -165,11 +165,7 @@ export function NavMain({ items }: NavMainProps) {
             <SidebarMenu>
               {group.items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isItemActive(item.url)}
-                    tooltip={item.title}
-                  >
+                  <SidebarMenuButton asChild isActive={isItemActive(item.url)} tooltip={item.title}>
                     <Link href={item.url}>
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>

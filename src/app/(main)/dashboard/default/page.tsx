@@ -1,17 +1,21 @@
 "use client";
 
 import { useState } from "react";
+
 import { useRouter } from "next/navigation";
 import { Users, FileUser, Calendar, FileText, List, UserPlus, Search, X, CalendarDays } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+
+import CalculoAntiguedad from "./_components/calculo-antiguedad";
 
 export default function Page() {
   const router = useRouter();
@@ -620,9 +624,7 @@ export default function Page() {
             <Users className="h-6 w-6" />
             <h2 className="text-3xl font-bold tracking-tight">Sistema de Junta Primaria</h2>
           </div>
-          <p className="text-muted-foreground mt-2">
-            Gestión de titulares, suplencias y administración del sistema.
-          </p>
+          <p className="text-muted-foreground mt-2">Gestión de titulares, suplencias y administración del sistema.</p>
         </div>
       </div>
 
@@ -658,12 +660,8 @@ export default function Page() {
                 <CardDescription>Administrar y consultar información de titulares</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex flex-col gap-4 items-start">
-                  <Button 
-                    className="flex items-center space-x-2" 
-                    size="lg"
-                    onClick={() => setShowCargarForm(true)}
-                  >
+                <div className="flex flex-col items-start gap-4">
+                  <Button className="flex items-center space-x-2" size="lg" onClick={() => setShowCargarForm(true)}>
                     <UserPlus className="h-5 w-5" />
                     <span>Cargar Titular</span>
                   </Button>
@@ -805,11 +803,7 @@ export default function Page() {
                     <CardTitle>Cargar Antigüedad Titular</CardTitle>
                     <CardDescription>Complete todos los campos requeridos</CardDescription>
                   </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setShowCargarForm(false)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setShowCargarForm(false)}>
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
@@ -828,7 +822,7 @@ export default function Page() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="dni">N° D.N.I.:</Label>
                     <div className="flex gap-2">
@@ -875,7 +869,7 @@ export default function Page() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="nombre">Nombre:</Label>
                     <Input 
@@ -896,7 +890,7 @@ export default function Page() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="fecha-titularizacion">Fecha de Titularización:</Label>
                     <Input 
@@ -928,11 +922,11 @@ export default function Page() {
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium bg-gray-100 p-2 rounded">
+                  <h3 className="rounded bg-gray-100 p-2 text-lg font-medium">
                     Datos para conformar el Listado de Traslado
                   </h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="tipo-traslado">Tipo de Traslado:</Label>
                       <Select value={formData.tipo_traslado} onValueChange={(value) => setFormData(prev => ({ ...prev, tipo_traslado: value }))}>
@@ -957,7 +951,7 @@ export default function Page() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <div className="space-y-2">
                       <Label htmlFor="categoria">Categoría:</Label>
                       <Select value={formData.categoria} onValueChange={(value) => setFormData(prev => ({ ...prev, categoria: value }))}>
@@ -1003,13 +997,7 @@ export default function Page() {
 
                   <div className="space-y-2">
                     <Label htmlFor="observaciones">Observaciones:</Label>
-                    <Textarea 
-                      id="observaciones" 
-                      placeholder="Ingrese observaciones"
-                      rows={4}
-                      value={formData.observaciones}
-                      onChange={(e) => setFormData(prev => ({ ...prev, observaciones: e.target.value }))}
-                    />
+                    <Textarea id="observaciones" placeholder="Ingrese observaciones" rows={4} />
                   </div>
                 </div>
 
@@ -1086,21 +1074,18 @@ export default function Page() {
               <CardDescription>Administrar y consultar información de suplencias</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-muted-foreground">Contenido de suplencias - Pendiente de implementación</p>
+              <div className="flex flex-col items-start gap-4">
+                <Button variant="outline" className="flex items-center space-x-2" size="lg">
+                  <Search className="h-5 w-5" />
+                  <span>Buscar Suplencia</span>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="antiguedad" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Antigüedad para Traslado</CardTitle>
-              <CardDescription>Consultar y gestionar antigüedad para traslados</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">Contenido de antigüedad - En desarrollo</p>
-            </CardContent>
-          </Card>
+          <CalculoAntiguedad onClose={() => setActiveTab("titulares")} />
         </TabsContent>
 
         <TabsContent value="planillas" className="space-y-4">

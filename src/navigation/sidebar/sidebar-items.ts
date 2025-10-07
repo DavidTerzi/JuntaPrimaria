@@ -1,8 +1,4 @@
-import {
-  Home,
-  Users,
-  type LucideIcon,
-} from "lucide-react";
+import { Home, Users, type LucideIcon } from "lucide-react";
 
 export interface NavSubItem {
   title: string;

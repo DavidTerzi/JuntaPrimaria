@@ -1,10 +1,11 @@
 // lib/auth.ts
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { executeQuery, Usuario, UsuarioCompleto } from "./db";
 
-const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-key";
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "3h";
+import { executeQuery, UsuarioCompleto } from "./db";
+
+const JWT_SECRET = process.env.JWT_SECRET ?? "fallback-secret-key";
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN ?? "3h";
 
 export interface LoginCredentials {
   username: string;
@@ -65,10 +66,11 @@ export async function validateLogin(credentials: LoginCredentials): Promise<Auth
         rol: user.rol_nombre,
       },
       JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN },
+      { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions,
     );
 
     // Remover password_hash de la respuesta
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password_hash, ...userWithoutPassword } = user;
 
     return {
@@ -90,7 +92,7 @@ export async function validateLogin(credentials: LoginCredentials): Promise<Auth
 export function verifyToken(token: string) {
   try {
     return jwt.verify(token, JWT_SECRET);
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -139,7 +141,7 @@ export async function createUser(userData: {
     const existingUsers = (await executeQuery("SELECT id FROM usuarios WHERE username = ? OR email = ?", [
       userData.username,
       userData.email,
-    ])) as any[];
+    ])) as UsuarioCompleto[];
 
     if (existingUsers.length > 0) {
       return {
@@ -165,15 +167,15 @@ export async function createUser(userData: {
         userData.telefono,
         userData.rol_id,
       ],
-    )) as any;
+    )) as unknown;
 
     // Obtener el usuario recién creado
-    const newUser = await getUserById(result.insertId);
+    const newUser = await getUserById((result as { insertId: number }).insertId);
 
     return {
       success: true,
       message: "Usuario creado exitosamente",
-      user: newUser || undefined,
+      user: newUser ?? undefined,
     };
   } catch (error) {
     console.error("Error en createUser:", error);

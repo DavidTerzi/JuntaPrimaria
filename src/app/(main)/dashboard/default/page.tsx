@@ -749,47 +749,117 @@ export default function Page() {
                         </div>
                       </div>
                       
-                      <Table>
-                        <TableHeader>
-                          <TableRow className="bg-gray-800 text-white">
-                            <TableHead className="font-semibold text-white">Fecha de Titularización</TableHead>
-                            <TableHead className="font-semibold text-white">Fecha de Traslado o Baja</TableHead>
-                            <TableHead className="font-semibold text-white">Establecimiento</TableHead>
-                            <TableHead className="font-semibold text-white">Años</TableHead>
-                            <TableHead className="font-semibold text-white">Meses</TableHead>
-                            <TableHead className="font-semibold text-white">Días</TableHead>
-                            <TableHead className="font-semibold text-white">Tipo de Traslado</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {establecimientosHistorial.map((establecimiento: any, index) => (
-                            <TableRow key={index} className="hover:bg-gray-50">
-                              <TableCell className="text-sm">
-                                {new Date(establecimiento.fecha_titularizacion).toLocaleDateString('es-ES', {
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                  year: 'numeric'
-                                })}
-                              </TableCell>
-                              <TableCell className="text-sm">
-                                {establecimiento.fecha_traslado_baja ? 
-                                  new Date(establecimiento.fecha_traslado_baja).toLocaleDateString('es-ES', {
+                      <div className="border border-gray-200 rounded-lg bg-white">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="bg-gray-50 border-b border-gray-200">
+                              <TableHead className="h-12 px-4 text-left align-middle font-medium text-gray-500 text-sm">Fecha de Titularización</TableHead>
+                              <TableHead className="h-12 px-4 text-left align-middle font-medium text-gray-500 text-sm">Fecha de Traslado o Baja</TableHead>
+                              <TableHead className="h-12 px-4 text-left align-middle font-medium text-gray-500 text-sm">Establecimiento</TableHead>
+                              <TableHead className="h-12 px-4 text-center align-middle font-medium text-gray-500 text-sm">Años</TableHead>
+                              <TableHead className="h-12 px-4 text-center align-middle font-medium text-gray-500 text-sm">Meses</TableHead>
+                              <TableHead className="h-12 px-4 text-center align-middle font-medium text-gray-500 text-sm">Días</TableHead>
+                              <TableHead className="h-12 px-4 text-center align-middle font-medium text-gray-500 text-sm">Tipo de Traslado</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {establecimientosHistorial.map((establecimiento: any, index) => (
+                              <TableRow key={index} className="border-b border-gray-100 hover:bg-gray-50/50">
+                                <TableCell className="px-4 py-3 text-sm">
+                                  {new Date(establecimiento.fecha_titularizacion).toLocaleDateString('es-ES', {
                                     day: '2-digit',
                                     month: '2-digit',
                                     year: 'numeric'
-                                  }) : 
-                                  'Activo'
-                                }
-                              </TableCell>
-                              <TableCell className="text-sm font-medium">{establecimiento.establecimiento}</TableCell>
-                              <TableCell className="text-sm text-center">{establecimiento.anos}</TableCell>
-                              <TableCell className="text-sm text-center">{establecimiento.meses}</TableCell>
-                              <TableCell className="text-sm text-center">{establecimiento.dias}</TableCell>
-                              <TableCell className="text-sm">{establecimiento.tipo_traslado}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                                  })}
+                                </TableCell>
+                                <TableCell className="px-4 py-3 text-sm">
+                                  {establecimiento.fecha_traslado_baja ? (
+                                    <span className="text-gray-900">
+                                      {new Date(establecimiento.fecha_traslado_baja).toLocaleDateString('es-ES', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric'
+                                      })}
+                                    </span>
+                                  ) : (
+                                    <span className="inline-flex items-center text-xs font-medium text-green-700">
+                                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1.5"></div>
+                                      Activo
+                                    </span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="px-4 py-3 text-sm">
+                                  <span className="text-blue-600 font-medium hover:text-blue-800 cursor-pointer">
+                                    {establecimiento.establecimiento}
+                                  </span>
+                                </TableCell>
+                                <TableCell className="px-4 py-3 text-sm text-center">
+                                  <span className="font-medium text-gray-900">
+                                    {establecimiento.anos}
+                                  </span>
+                                </TableCell>
+                                <TableCell className="px-4 py-3 text-sm text-center">
+                                  <span className="font-medium text-gray-900">
+                                    {establecimiento.meses}
+                                  </span>
+                                </TableCell>
+                                <TableCell className="px-4 py-3 text-sm text-center">
+                                  <span className="font-medium text-gray-900">
+                                    {establecimiento.dias}
+                                  </span>
+                                </TableCell>
+                                <TableCell className="px-4 py-3 text-sm text-center">
+                                  <span className="text-blue-600 font-medium">
+                                    {establecimiento.tipo_traslado}
+                                  </span>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                        
+                        {/* Paginación */}
+                        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50">
+                          <div className="flex items-center text-sm text-gray-500">
+                            <span>0 of {establecimientosHistorial.length} row(s) selected.</span>
+                          </div>
+                          <div className="flex items-center space-x-6">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-sm text-gray-500">Rows per page</span>
+                              <select className="border border-gray-300 rounded px-2 py-1 text-sm bg-white">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                              </select>
+                            </div>
+                            <div className="flex items-center space-x-2 text-sm text-gray-500">
+                              <span>Page 1 of 1</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <button className="p-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7M21 19l-7-7 7-7" />
+                                </svg>
+                              </button>
+                              <button className="p-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                </svg>
+                              </button>
+                              <button className="p-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                              </button>
+                              <button className="p-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
                 )}

@@ -5,10 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface CalculoAntiguedadProps {
-  // onClose: () => void;
+  onClose: () => void;
 }
 
-export default function CalculoAntiguedad({}: CalculoAntiguedadProps) {
+export default function CalculoAntiguedad({ onClose }: CalculoAntiguedadProps) {
   // Datos de ejemplo basados en la imagen
   const datosAntiguedad = [
     {

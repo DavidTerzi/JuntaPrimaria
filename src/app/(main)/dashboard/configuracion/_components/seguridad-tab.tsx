@@ -21,39 +21,22 @@ export function SeguridadTab() {
             <Lock className="h-5 w-5" />
             <span>Cambiar Contraseña</span>
           </CardTitle>
-          <CardDescription>
-            Actualiza tu contraseña para mantener tu cuenta segura
-          </CardDescription>
+          <CardDescription>Actualiza tu contraseña para mantener tu cuenta segura</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
             <Label htmlFor="current-password">Contraseña Actual</Label>
-            <Input
-              id="current-password"
-              type="password"
-              placeholder="Ingresa tu contraseña actual"
-              className="mt-1"
-            />
+            <Input id="current-password" type="password" placeholder="Ingresa tu contraseña actual" className="mt-1" />
           </div>
 
           <div>
             <Label htmlFor="new-password">Nueva Contraseña</Label>
-            <Input
-              id="new-password"
-              type="password"
-              placeholder="Ingresa tu nueva contraseña"
-              className="mt-1"
-            />
+            <Input id="new-password" type="password" placeholder="Ingresa tu nueva contraseña" className="mt-1" />
           </div>
 
           <div>
             <Label htmlFor="confirm-password">Confirmar Nueva Contraseña</Label>
-            <Input
-              id="confirm-password"
-              type="password"
-              placeholder="Confirma tu nueva contraseña"
-              className="mt-1"
-            />
+            <Input id="confirm-password" type="password" placeholder="Confirma tu nueva contraseña" className="mt-1" />
           </div>
 
           <Alert>
@@ -74,17 +57,13 @@ export function SeguridadTab() {
             <Shield className="h-5 w-5" />
             <span>Configuración de Seguridad</span>
           </CardTitle>
-          <CardDescription>
-            Opciones de seguridad para tu cuenta
-          </CardDescription>
+          <CardDescription>Opciones de seguridad para tu cuenta</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label className="text-base">Autenticación de Dos Factores</Label>
-              <p className="text-sm text-muted-foreground">
-                Añade una capa extra de seguridad a tu cuenta
-              </p>
+              <p className="text-muted-foreground text-sm">Añade una capa extra de seguridad a tu cuenta</p>
             </div>
             <Switch />
           </div>
@@ -94,9 +73,7 @@ export function SeguridadTab() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label className="text-base">Notificaciones de Inicio de Sesión</Label>
-              <p className="text-sm text-muted-foreground">
-                Recibe alertas cuando alguien acceda a tu cuenta
-              </p>
+              <p className="text-muted-foreground text-sm">Recibe alertas cuando alguien acceda a tu cuenta</p>
             </div>
             <Switch defaultChecked />
           </div>
@@ -106,7 +83,7 @@ export function SeguridadTab() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label className="text-base">Cerrar Sesiones Inactivas</Label>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Cierra automáticamente sesiones después de 30 minutos de inactividad
               </p>
             </div>
@@ -122,22 +99,22 @@ export function SeguridadTab() {
             <Key className="h-5 w-5" />
             <span>Claves API</span>
           </CardTitle>
-          <CardDescription>
-            Administra las claves de API para integraciones
-          </CardDescription>
+          <CardDescription>Administra las claves de API para integraciones</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 border rounded-lg">
+          <div className="flex items-center justify-between rounded-lg border p-4">
             <div>
               <p className="font-medium">API Principal</p>
-              <p className="text-sm text-muted-foreground">sk-••••••••••••••••••••••••••••••••</p>
-              <p className="text-xs text-muted-foreground">Creada el 15 de enero, 2024</p>
+              <p className="text-muted-foreground text-sm">sk-••••••••••••••••••••••••••••••••</p>
+              <p className="text-muted-foreground text-xs">Creada el 15 de enero, 2024</p>
             </div>
-            <Button variant="outline" size="sm">Regenerar</Button>
+            <Button variant="outline" size="sm">
+              Regenerar
+            </Button>
           </div>
 
           <Button variant="outline">
-            <Key className="h-4 w-4 mr-2" />
+            <Key className="mr-2 h-4 w-4" />
             Crear Nueva Clave API
           </Button>
         </CardContent>
@@ -150,34 +127,32 @@ export function SeguridadTab() {
             <History className="h-5 w-5" />
             <span>Actividad Reciente</span>
           </CardTitle>
-          <CardDescription>
-            Últimas actividades de seguridad en tu cuenta
-          </CardDescription>
+          <CardDescription>Últimas actividades de seguridad en tu cuenta</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center justify-between rounded-lg border p-3">
               <div>
                 <p className="text-sm font-medium">Inicio de sesión exitoso</p>
-                <p className="text-xs text-muted-foreground">IP: 192.168.1.100 • Hace 2 horas</p>
+                <p className="text-muted-foreground text-xs">IP: 192.168.1.100 • Hace 2 horas</p>
               </div>
-              <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+              <div className="h-2 w-2 rounded-full bg-green-500"></div>
             </div>
 
-            <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center justify-between rounded-lg border p-3">
               <div>
                 <p className="text-sm font-medium">Contraseña modificada</p>
-                <p className="text-xs text-muted-foreground">IP: 192.168.1.100 • Hace 1 día</p>
+                <p className="text-muted-foreground text-xs">IP: 192.168.1.100 • Hace 1 día</p>
               </div>
-              <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+              <div className="h-2 w-2 rounded-full bg-blue-500"></div>
             </div>
 
-            <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center justify-between rounded-lg border p-3">
               <div>
                 <p className="text-sm font-medium">Nuevo dispositivo detectado</p>
-                <p className="text-xs text-muted-foreground">IP: 10.0.0.25 • Hace 3 días</p>
+                <p className="text-muted-foreground text-xs">IP: 10.0.0.25 • Hace 3 días</p>
               </div>
-              <div className="h-2 w-2 bg-yellow-500 rounded-full"></div>
+              <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
             </div>
           </div>
         </CardContent>

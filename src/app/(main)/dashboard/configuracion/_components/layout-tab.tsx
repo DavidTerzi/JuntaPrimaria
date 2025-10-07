@@ -19,9 +19,7 @@ export function LayoutTab() {
             <Layout className="h-5 w-5" />
             <span>Configuración de Layout</span>
           </CardTitle>
-          <CardDescription>
-            Personaliza la apariencia y el comportamiento de la interfaz
-          </CardDescription>
+          <CardDescription>Personaliza la apariencia y el comportamiento de la interfaz</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Tema */}
@@ -30,8 +28,8 @@ export function LayoutTab() {
               <Palette className="h-4 w-4" />
               <Label className="text-base font-medium">Tema</Label>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="modo-tema">Modo de Tema</Label>
                 <Select defaultValue="light">
@@ -75,9 +73,7 @@ export function LayoutTab() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label className="text-base">Sidebar Colapsable</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Permite contraer el menú lateral
-                  </p>
+                  <p className="text-muted-foreground text-sm">Permite contraer el menú lateral</p>
                 </div>
                 <Switch defaultChecked />
               </div>
@@ -85,9 +81,7 @@ export function LayoutTab() {
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label className="text-base">Auto Colapsar en Móvil</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Colapsa automáticamente en dispositivos pequeños
-                  </p>
+                  <p className="text-muted-foreground text-sm">Colapsa automáticamente en dispositivos pequeños</p>
                 </div>
                 <Switch defaultChecked />
               </div>
@@ -101,9 +95,7 @@ export function LayoutTab() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label className="text-base">Breadcrumbs</Label>
-                <p className="text-sm text-muted-foreground">
-                  Mostrar navegación de migas de pan
-                </p>
+                <p className="text-muted-foreground text-sm">Mostrar navegación de migas de pan</p>
               </div>
               <Switch defaultChecked />
             </div>
@@ -111,9 +103,7 @@ export function LayoutTab() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label className="text-base">Animaciones</Label>
-                <p className="text-sm text-muted-foreground">
-                  Habilitar transiciones y animaciones
-                </p>
+                <p className="text-muted-foreground text-sm">Habilitar transiciones y animaciones</p>
               </div>
               <Switch defaultChecked />
             </div>

@@ -13,23 +13,21 @@ interface LogoProps {
 
 export function Logo({ className = "", size = "md", showText = true }: LogoProps) {
   const { theme } = useTheme();
-  
+
   const heightClasses = {
     sm: "h-6",
-    md: "h-8", 
-    lg: "h-12"
+    md: "h-8",
+    lg: "h-12",
   };
 
   const textSizeClasses = {
     sm: "text-sm",
     md: "text-base",
-    lg: "text-xl"
+    lg: "text-xl",
   };
 
   // Seleccionar logo según el tema
-  const logoSrc = theme === "dark" 
-    ? "/logos/san-juan-gob-dark.png" 
-    : "/logos/san-juan-gob-light.png";
+  const logoSrc = theme === "dark" ? "/logos/san-juan-gob-dark.png" : "/logos/san-juan-gob-light.png";
 
   return (
     <div className={`flex items-center space-x-3 ${className}`}>
@@ -44,16 +42,12 @@ export function Logo({ className = "", size = "md", showText = true }: LogoProps
           priority
         />
       </div>
-      
+
       {/* Texto opcional para casos donde se necesite solo el logo */}
       {showText && (
         <div className="flex flex-col leading-tight">
-          <span className={`${textSizeClasses[size]} font-bold text-foreground`}>
-            Junta Primaria
-          </span>
-          <span className={`text-xs text-muted-foreground font-medium`}>
-            Sistema de Gestión
-          </span>
+          <span className={`${textSizeClasses[size]} text-foreground font-bold`}>Junta Primaria</span>
+          <span className={`text-muted-foreground text-xs font-medium`}>Sistema de Gestión</span>
         </div>
       )}
     </div>

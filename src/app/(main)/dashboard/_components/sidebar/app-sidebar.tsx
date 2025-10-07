@@ -10,7 +10,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
+import { Logo } from "@/components/logo";
 import { APP_CONFIG } from "@/config/app-config";
 import { sidebarItems } from "@/navigation/sidebar/sidebar-items";
 
@@ -27,16 +29,18 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   };
 }
 
-export function AppSidebar({ user, ...props }: AppSidebarProps) {
+function SidebarInner({ user }: { user?: AppSidebarProps['user'] }) {
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
+
   return (
-    <Sidebar {...props}>
+    <>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
-              <a href="#">
-                <Command />
-                <span className="text-base font-semibold">{APP_CONFIG.name}</span>
+            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-3 data-[slot=sidebar-menu-button]:h-auto">
+              <a href="/dashboard" className="flex items-center justify-center">
+                <Logo size="md" showText={false} collapsed={isCollapsed} className="" />
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -44,10 +48,16 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={sidebarItems} />
-        {/* <NavDocuments items={data.documents} /> */}
-        {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>{user && <NavUser user={user} />}</SidebarFooter>
+    </>
+  );
+}
+
+export function AppSidebar({ user, ...props }: AppSidebarProps) {
+  return (
+    <Sidebar {...props}>
+      <SidebarInner user={user} />
     </Sidebar>
   );
 }

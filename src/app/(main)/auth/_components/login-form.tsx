@@ -8,14 +8,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
 const FormSchema = z.object({
-  username: z.string().min(1, { message: "Usuario o email es requerido." }),
+  username: z.string().min(1, { message: "Usuario es requerido." }),
   password: z.string().min(1, { message: "Contraseña es requerida." }),
-  remember: z.boolean().optional(),
 });
 
 type FormData = z.infer<typeof FormSchema>;
@@ -29,7 +27,6 @@ export function LoginForm() {
     defaultValues: {
       username: "",
       password: "",
-      remember: false,
     },
   });
 
@@ -80,12 +77,12 @@ export function LoginForm() {
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Usuario o Email</FormLabel>
+              <FormLabel>Usuario</FormLabel>
               <FormControl>
                 <Input
                   id="username"
                   type="text"
-                  placeholder="admin o admin@juntaprimaria.gov.ar"
+                  placeholder="Ingrese su usuario"
                   autoComplete="username"
                   disabled={isLoading}
                   {...field}
@@ -105,33 +102,13 @@ export function LoginForm() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="Ingrese su contraseña"
                   autoComplete="current-password"
                   disabled={isLoading}
                   {...field}
                 />
               </FormControl>
               <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="remember"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center">
-              <FormControl>
-                <Checkbox
-                  id="login-remember"
-                  checked={field.value || false}
-                  onCheckedChange={field.onChange}
-                  className="size-4"
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormLabel htmlFor="login-remember" className="text-muted-foreground ml-1 text-sm font-medium">
-                Recordarme por 30 días
-              </FormLabel>
             </FormItem>
           )}
         />

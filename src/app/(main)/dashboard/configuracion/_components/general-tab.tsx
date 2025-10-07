@@ -19,27 +19,18 @@ export function GeneralTab() {
             <Settings className="h-5 w-5" />
             <span>Configuración General del Sistema</span>
           </CardTitle>
-          <CardDescription>
-            Configuración básica del sistema y preferencias generales
-          </CardDescription>
+          <CardDescription>Configuración básica del sistema y preferencias generales</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="sistema-nombre">Nombre del Sistema</Label>
-              <Input
-                id="sistema-nombre"
-                defaultValue="Sistema Junta Primaria San Juan"
-              />
+              <Input id="sistema-nombre" defaultValue="Sistema Junta Primaria San Juan" />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="sistema-version">Versión</Label>
-              <Input
-                id="sistema-version"
-                defaultValue="1.0.0"
-                disabled
-              />
+              <Input id="sistema-version" defaultValue="1.0.0" disabled />
             </div>
 
             <div className="space-y-2">

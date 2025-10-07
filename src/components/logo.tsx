@@ -56,7 +56,7 @@ export function Logo({ className = "", size = "md", showText = true, collapsed =
           priority
         />
       </div>
-      
+
       {/* Texto opcional para casos donde se necesite solo el logo */}
       {showText && !collapsed && (
         <div className="flex flex-col leading-tight min-w-0">

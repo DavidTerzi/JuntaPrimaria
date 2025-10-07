@@ -1,17 +1,17 @@
 // lib/db.ts
-import mysql from 'mysql2/promise';
+import mysql from "mysql2/promise";
 
 // Configuración de la base de datos
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'juntaprimaria_db',
-  port: parseInt(process.env.DB_PORT || '3306'),
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "juntaprimaria_db",
+  port: parseInt(process.env.DB_PORT || "3306"),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  charset: 'utf8mb4'
+  charset: "utf8mb4",
 };
 
 // Pool de conexiones para mejor rendimiento
@@ -37,7 +37,7 @@ export const executeQuery = async (query: string, params?: any[]) => {
     const [rows] = await pool.execute(query, params);
     return rows;
   } catch (error) {
-    console.error('Error executing query:', error);
+    console.error("Error executing query:", error);
     throw error;
   }
 };

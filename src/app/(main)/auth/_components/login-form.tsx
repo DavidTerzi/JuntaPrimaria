@@ -23,7 +23,7 @@ type FormData = z.infer<typeof FormSchema>;
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  
+
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -35,12 +35,12 @@ export function LoginForm() {
 
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
-    
+
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           username: data.username,
@@ -56,14 +56,14 @@ export function LoginForm() {
         });
 
         // Redireccionar al dashboard
-        router.push('/dashboard/default');
+        router.push("/dashboard/default");
       } else {
         toast.error("Error de autenticación", {
           description: result.message,
         });
       }
     } catch (error) {
-      console.error('Error en login:', error);
+      console.error("Error en login:", error);
       toast.error("Error de conexión", {
         description: "No se pudo conectar con el servidor",
       });
@@ -82,13 +82,13 @@ export function LoginForm() {
             <FormItem>
               <FormLabel>Usuario o Email</FormLabel>
               <FormControl>
-                <Input 
-                  id="username" 
-                  type="text" 
-                  placeholder="admin o admin@juntaprimaria.gov.ar" 
-                  autoComplete="username" 
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="admin o admin@juntaprimaria.gov.ar"
+                  autoComplete="username"
                   disabled={isLoading}
-                  {...field} 
+                  {...field}
                 />
               </FormControl>
               <FormMessage />

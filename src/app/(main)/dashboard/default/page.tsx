@@ -1,32 +1,25 @@
 "use client";
 
 import { useState } from "react";
+
 import { useRouter } from "next/navigation";
+
 import { Users, FileUser, Calendar, FileText, List, UserPlus, Search, X } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+
+import CalculoAntiguedad from "./_components/calculo-antiguedad";
 
 export default function Page() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("titulares");
   const [showCargarForm, setShowCargarForm] = useState(false);
-  const [showBuscarModal, setShowBuscarModal] = useState(false);
-  const [showBuscarSuplenciaModal, setShowBuscarSuplenciaModal] = useState(false);
-  const [buscarDni, setBuscarDni] = useState("");
-  const [buscarSuplencia, setBuscarSuplencia] = useState("");
 
   return (
     <div className="flex flex-1 flex-col space-y-8 p-8">
@@ -78,44 +71,10 @@ export default function Page() {
                     <span>Cargar Titular</span>
                   </Button>
 
-                  <Dialog open={showBuscarModal} onOpenChange={setShowBuscarModal}>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" className="flex items-center space-x-2" size="lg">
-                        <Search className="h-5 w-5" />
-                        <span>Buscar Titular</span>
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Introducir el valor del parámetro</DialogTitle>
-                        <DialogDescription>Ingrese N° DNI</DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <div>
-                          <Input
-                            placeholder="N° DNI"
-                            value={buscarDni}
-                            onChange={(e) => setBuscarDni(e.target.value)}
-                          />
-                        </div>
-                        <div className="flex justify-end space-x-2">
-                          <Button variant="outline" onClick={() => setShowBuscarModal(false)}>
-                            Cancelar
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              // TODO: Aquí se agregará la lógica de búsqueda cuando tengamos la base de datos
-                              console.log("Buscando DNI:", buscarDni);
-                              setShowBuscarModal(false);
-                              setBuscarDni(""); // Limpiar el campo
-                            }}
-                          >
-                            Aceptar
-                          </Button>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                  <Button variant="outline" className="flex items-center space-x-2" size="lg">
+                    <Search className="h-5 w-5" />
+                    <span>Buscar Titular</span>
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -260,75 +219,17 @@ export default function Page() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-col items-start gap-4">
-                <Dialog open={showBuscarSuplenciaModal} onOpenChange={setShowBuscarSuplenciaModal}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="flex items-center space-x-2" size="lg">
-                      <Search className="h-5 w-5" />
-                      <span>Buscar Suplencia</span>
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Introducir el valor del parámetro</DialogTitle>
-                      <DialogDescription>
-                        Ingrese término de búsqueda (DNI, nombre, establecimiento, etc.)
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Input
-                          placeholder="Término de búsqueda"
-                          value={buscarSuplencia}
-                          onChange={(e) => setBuscarSuplencia(e.target.value)}
-                          onKeyPress={(e) => {
-                            if (e.key === "Enter" && buscarSuplencia.trim()) {
-                              router.push(`/dashboard/suplencias?search=${encodeURIComponent(buscarSuplencia.trim())}`);
-                              setShowBuscarSuplenciaModal(false);
-                              setBuscarSuplencia("");
-                            }
-                          }}
-                        />
-                      </div>
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            setShowBuscarSuplenciaModal(false);
-                            setBuscarSuplencia("");
-                          }}
-                        >
-                          Cancelar
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            if (buscarSuplencia.trim()) {
-                              router.push(`/dashboard/suplencias?search=${encodeURIComponent(buscarSuplencia.trim())}`);
-                              setShowBuscarSuplenciaModal(false);
-                              setBuscarSuplencia("");
-                            }
-                          }}
-                        >
-                          Aceptar
-                        </Button>
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                <Button variant="outline" className="flex items-center space-x-2" size="lg">
+                  <Search className="h-5 w-5" />
+                  <span>Buscar Suplencia</span>
+                </Button>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="antiguedad" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Antigüedad para Traslado</CardTitle>
-              <CardDescription>Consultar y gestionar antigüedad para traslados</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">Contenido de antigüedad - En desarrollo</p>
-            </CardContent>
-          </Card>
+          <CalculoAntiguedad onClose={() => setActiveTab("titulares")} />
         </TabsContent>
 
         <TabsContent value="planillas" className="space-y-4">

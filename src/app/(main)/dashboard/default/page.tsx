@@ -3,14 +3,15 @@
 import { useState } from "react";
 
 import { useRouter } from "next/navigation";
+
 import { Users, FileUser, Calendar, FileText, List, UserPlus, Search, X, CalendarDays } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,7 +26,7 @@ export default function Page() {
   const [showLicenciasModal, setShowLicenciasModal] = useState(false);
 
   const [buscarDni, setBuscarDni] = useState("");
-  
+
   // Estados para búsqueda de titulares
   const [datosDocente, setDatosDocente] = useState<any>(null);
   const [establecimientosHistorial, setEstablecimientosHistorial] = useState([]);
@@ -46,7 +47,7 @@ export default function Page() {
     categoria: "",
     turno: "",
     radio: "",
-    observaciones: ""
+    observaciones: "",
   });
   const [cargandoPersona, setCargandoPersona] = useState(false);
   const [guardandoFormulario, setGuardandoFormulario] = useState(false);
@@ -61,7 +62,7 @@ export default function Page() {
     id_tipo: "",
     fecha_inicio: "",
     fecha_fin: "",
-    observaciones: ""
+    observaciones: "",
   });
   const [cargandoPersonaLicencia, setCargandoPersonaLicencia] = useState(false);
   const [guardandoLicencia, setGuardandoLicencia] = useState(false);
@@ -82,7 +83,7 @@ export default function Page() {
     fecha_baja: "",
     primera_titularizacion: "",
     segunda_titularizacion: "",
-    observaciones: ""
+    observaciones: "",
   });
   const [cargandoPersonaSuplencia, setCargandoPersonaSuplencia] = useState(false);
   const [guardandoSuplencia, setGuardandoSuplencia] = useState(false);
@@ -104,10 +105,10 @@ export default function Page() {
 
     try {
       // Buscar datos básicos de la persona
-      const responsePersona = await fetch('/api/personas/search', {
-        method: 'POST',
+      const responsePersona = await fetch("/api/personas/search", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ dni: dni.trim() }),
       });
@@ -117,12 +118,12 @@ export default function Page() {
       if (dataPersona.success && dataPersona.data.length > 0) {
         const persona = dataPersona.data[0];
         setPersonaEncontrada(persona);
-        
+
         // Ahora buscar el historial de cargos para obtener el último cargo
         try {
           const responseHistorial = await fetch(`/api/historial-cargos?dni=${dni.trim()}`);
           const dataHistorial = await responseHistorial.json();
-          
+
           let ultimoCargo = "";
           if (dataHistorial.success && dataHistorial.data.length > 0) {
             // Obtener el cargo más reciente (primer elemento ya que está ordenado por fecha DESC)
@@ -132,12 +133,12 @@ export default function Page() {
           // Si no encontramos cargo en historial_cargos, buscar en suplencias
           if (!ultimoCargo) {
             try {
-              const responseSuplencias = await fetch('/api/suplencias');
+              const responseSuplencias = await fetch("/api/suplencias");
               const dataSuplencias = await responseSuplencias.json();
-              
+
               if (dataSuplencias.success && dataSuplencias.data.length > 0) {
                 // Buscar suplencias de esta persona
-                const suplenciasPersona = dataSuplencias.data.filter((sup: any) => 
+                const suplenciasPersona = dataSuplencias.data.filter((sup: any) =>
                   sup.dni === dni.trim()
                 );
                 if (suplenciasPersona.length > 0) {
@@ -145,15 +146,15 @@ export default function Page() {
                 }
               }
             } catch (suplenciasError) {
-              console.log('No se pudo buscar en suplencias:', suplenciasError);
+              console.log("No se pudo buscar en suplencias:", suplenciasError);
             }
           }
 
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             apellido: persona.apellido || "",
             nombre: persona.nombre || "",
-            denominacion_cargo: ultimoCargo
+            denominacion_cargo: ultimoCargo,
           }));
 
           if (ultimoCargo) {
@@ -161,24 +162,22 @@ export default function Page() {
           } else {
             setMensajeFormulario("Persona encontrada - sin historial de cargos previo");
           }
-
         } catch (historialError) {
-          console.log('Error al buscar historial:', historialError);
+          console.log("Error al buscar historial:", historialError);
           // Si falla la búsqueda de historial, al menos cargar los datos básicos
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             apellido: persona.apellido || "",
-            nombre: persona.nombre || ""
+            nombre: persona.nombre || "",
           }));
           setMensajeFormulario("Persona encontrada - error al cargar historial de cargos");
         }
-
       } else {
         setPersonaEncontrada(null);
         setMensajeFormulario("Persona no encontrada - se creará un nuevo registro");
       }
     } catch (error) {
-      console.error('Error al buscar persona:', error);
+      console.error("Error al buscar persona:", error);
       setMensajeFormulario("Error al buscar persona");
       setPersonaEncontrada(null);
     } finally {
@@ -189,22 +188,22 @@ export default function Page() {
   // Función para cargar tipos de licencia
   const cargarTiposLicencia = async () => {
     try {
-      console.log('Cargando tipos de licencia...');
-      const response = await fetch('/api/tipos-licencias');
+      console.log("Cargando tipos de licencia...");
+      const response = await fetch("/api/tipos-licencias");
       const data = await response.json();
-      
-      console.log('Respuesta de tipos de licencia:', data);
-      
+
+      console.log("Respuesta de tipos de licencia:", data);
+
       if (data.success) {
         setTiposLicencia(data.data);
-        console.log('Tipos de licencia cargados:', data.data);
+        console.log("Tipos de licencia cargados:", data.data);
       } else {
-        console.error('Error en la respuesta:', data);
-        setMensajeLicencia('Error al cargar tipos de licencia');
+        console.error("Error en la respuesta:", data);
+        setMensajeLicencia("Error al cargar tipos de licencia");
       }
     } catch (error) {
-      console.error('Error al cargar tipos de licencia:', error);
-      setMensajeLicencia('Error al cargar tipos de licencia');
+      console.error("Error al cargar tipos de licencia:", error);
+      setMensajeLicencia("Error al cargar tipos de licencia");
     }
   };
 
@@ -216,10 +215,10 @@ export default function Page() {
     setMensajeLicencia("");
 
     try {
-      const response = await fetch('/api/personas/search', {
-        method: 'POST',
+      const response = await fetch("/api/personas/search", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ dni: dni.trim() }),
       });
@@ -229,10 +228,10 @@ export default function Page() {
       if (data.success && data.data.length > 0) {
         const persona = data.data[0];
         setPersonaEncontradaLicencia(persona);
-        setLicenciaData(prev => ({
+        setLicenciaData((prev) => ({
           ...prev,
           apellido: persona.apellido || "",
-          nombre: persona.nombre || ""
+          nombre: persona.nombre || "",
         }));
         setMensajeLicencia("Persona encontrada");
       } else {
@@ -240,7 +239,7 @@ export default function Page() {
         setMensajeLicencia("Persona no encontrada - se creará un nuevo registro");
       }
     } catch (error) {
-      console.error('Error al buscar persona:', error);
+      console.error("Error al buscar persona:", error);
       setMensajeLicencia("Error al buscar persona");
       setPersonaEncontradaLicencia(null);
     } finally {
@@ -251,7 +250,12 @@ export default function Page() {
   // Función para guardar licencia
   const guardarLicencia = async () => {
     // Validaciones básicas
-    if (!licenciaData.dni.trim() || !licenciaData.apellido.trim() || !licenciaData.nombre.trim() || !licenciaData.fecha_inicio.trim()) {
+    if (
+      !licenciaData.dni.trim() ||
+      !licenciaData.apellido.trim() ||
+      !licenciaData.nombre.trim() ||
+      !licenciaData.fecha_inicio.trim()
+    ) {
       setMensajeLicencia("DNI, apellido, nombre y fecha de inicio son requeridos");
       return;
     }
@@ -275,7 +279,7 @@ export default function Page() {
         setMensajeLicencia("Fecha de finalización no válida");
         return;
       }
-      
+
       if (fechaFin <= fechaInicio) {
         setMensajeLicencia("La fecha de finalización debe ser posterior a la fecha de inicio");
         return;
@@ -286,10 +290,10 @@ export default function Page() {
     setMensajeLicencia("");
 
     try {
-      const response = await fetch('/api/licencias', {
-        method: 'POST',
+      const response = await fetch("/api/licencias", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           id_persona: personaEncontradaLicencia?.id_persona || null,
@@ -299,7 +303,7 @@ export default function Page() {
           id_tipo: licenciaData.id_tipo || null,
           fecha_inicio: licenciaData.fecha_inicio,
           fecha_fin: licenciaData.fecha_fin || null,
-          observaciones: licenciaData.observaciones
+          observaciones: licenciaData.observaciones,
         }),
       });
 
@@ -315,7 +319,7 @@ export default function Page() {
           id_tipo: "",
           fecha_inicio: "",
           fecha_fin: "",
-          observaciones: ""
+          observaciones: "",
         });
         setPersonaEncontradaLicencia(null);
         // Cerrar modal después de 2 segundos
@@ -327,7 +331,7 @@ export default function Page() {
         setMensajeLicencia("Error al guardar: " + (data.error || "Error desconocido"));
       }
     } catch (error) {
-      console.error('Error al guardar licencia:', error);
+      console.error("Error al guardar licencia:", error);
       setMensajeLicencia("Error al guardar licencia");
     } finally {
       setGuardandoLicencia(false);
@@ -352,7 +356,7 @@ export default function Page() {
     if (formData.fecha_titularizacion && formData.fecha_traslado_baja) {
       const fechaTitularizacion = new Date(formData.fecha_titularizacion);
       const fechaTraslado = new Date(formData.fecha_traslado_baja);
-      
+
       if (fechaTraslado <= fechaTitularizacion) {
         setMensajeFormulario("La fecha de traslado/baja debe ser posterior a la fecha de titularización");
         return;
@@ -363,10 +367,10 @@ export default function Page() {
     setMensajeFormulario("");
 
     try {
-      const response = await fetch('/api/historial-cargos', {
-        method: 'POST',
+      const response = await fetch("/api/historial-cargos", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           id_persona: personaEncontrada?.id_persona || null,
@@ -382,7 +386,7 @@ export default function Page() {
           categoria: formData.categoria,
           turno: formData.turno,
           radio: formData.radio,
-          observaciones: formData.observaciones
+          observaciones: formData.observaciones,
         }),
       });
 
@@ -404,7 +408,7 @@ export default function Page() {
           categoria: "",
           turno: "",
           radio: "",
-          observaciones: ""
+          observaciones: "",
         });
         setPersonaEncontrada(null);
         // Cerrar formulario después de 2 segundos
@@ -416,7 +420,7 @@ export default function Page() {
         setMensajeFormulario("Error al guardar: " + (data.error || "Error desconocido"));
       }
     } catch (error) {
-      console.error('Error al guardar antigüedad:', error);
+      console.error("Error al guardar antigüedad:", error);
       setMensajeFormulario("Error al guardar antigüedad");
     } finally {
       setGuardandoFormulario(false);
@@ -434,10 +438,10 @@ export default function Page() {
     setMensajeBusqueda("");
 
     try {
-      const response = await fetch('/api/personas/establecimientos', {
-        method: 'POST',
+      const response = await fetch("/api/personas/establecimientos", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ dni: buscarDni.trim() }),
       });
@@ -454,7 +458,7 @@ export default function Page() {
         setMensajeBusqueda(data.message || "No se encontraron resultados");
       }
     } catch (error) {
-      console.error('Error al buscar:', error);
+      console.error("Error al buscar:", error);
       setDatosDocente(null);
       setEstablecimientosHistorial([]);
       setMensajeBusqueda("Error al realizar la búsqueda");
@@ -472,10 +476,10 @@ export default function Page() {
     setMensajeSuplencia("");
 
     try {
-      const response = await fetch('/api/personas/search', {
-        method: 'POST',
+      const response = await fetch("/api/personas/search", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ dni: dni.trim() }),
       });
@@ -485,43 +489,44 @@ export default function Page() {
       if (data.success && data.data.length > 0) {
         const persona = data.data[0];
         setPersonaEncontradaSuplencia(persona);
-        
+
         // Verificar cuántas suplencias activas tiene esta persona
         try {
           const responseSuplencias = await fetch(`/api/suplencias/nueva?dni=${dni.trim()}`);
           const dataSuplencias = await responseSuplencias.json();
-          
+
           if (dataSuplencias.success) {
-            const suplenciasActivas = dataSuplencias.data.filter((s: any) => 
-              s.activo === 1 && (!s.primera_titularizacion || !s.segunda_titularizacion)
+            const suplenciasActivas = dataSuplencias.data.filter(
+              (s: any) => s.activo === 1 && (!s.primera_titularizacion || !s.segunda_titularizacion),
             ).length;
-            
+
             setSuplenciasActivas(suplenciasActivas);
-            
+
             if (suplenciasActivas >= 2) {
-              setMensajeSuplencia("ATENCIÓN: Esta persona ya tiene 2 suplencias activas. Debe titularizar antes de agregar más.");
+              setMensajeSuplencia(
+                "ATENCIÓN: Esta persona ya tiene 2 suplencias activas. Debe titularizar antes de agregar más.",
+              );
             } else {
               setMensajeSuplencia(`Persona encontrada - Suplencias activas: ${suplenciasActivas}/2`);
             }
           }
         } catch (suplenciasError) {
-          console.log('No se pudo verificar suplencias:', suplenciasError);
+          console.log("No se pudo verificar suplencias:", suplenciasError);
           setSuplenciasActivas(0);
         }
-        
-        setSuplenciaData(prev => ({
+
+        setSuplenciaData((prev) => ({
           ...prev,
           apellido: persona.apellido || "",
-          nombre: persona.nombre || ""
+          nombre: persona.nombre || "",
         }));
-        
       } else {
         setPersonaEncontradaSuplencia(null);
         setSuplenciasActivas(0);
         setMensajeSuplencia("Persona no encontrada - se creará un nuevo registro");
       }
     } catch (error) {
-      console.error('Error al buscar persona:', error);
+      console.error("Error al buscar persona:", error);
       setMensajeSuplencia("Error al buscar persona");
       setPersonaEncontradaSuplencia(null);
     } finally {
@@ -532,7 +537,12 @@ export default function Page() {
   // Función para guardar suplencia
   const guardarSuplencia = async () => {
     // Validaciones básicas
-    if (!suplenciaData.dni.trim() || !suplenciaData.apellido.trim() || !suplenciaData.nombre.trim() || !suplenciaData.fecha_inicio.trim()) {
+    if (
+      !suplenciaData.dni.trim() ||
+      !suplenciaData.apellido.trim() ||
+      !suplenciaData.nombre.trim() ||
+      !suplenciaData.fecha_inicio.trim()
+    ) {
       setMensajeSuplencia("DNI, apellido, nombre y fecha de inicio son requeridos");
       return;
     }
@@ -553,10 +563,10 @@ export default function Page() {
     setMensajeSuplencia("");
 
     try {
-      const response = await fetch('/api/suplencias/nueva', {
-        method: 'POST',
+      const response = await fetch("/api/suplencias/nueva", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           id_persona: personaEncontradaSuplencia?.id_persona || null,
@@ -571,7 +581,7 @@ export default function Page() {
           fecha_baja: suplenciaData.fecha_baja || null,
           primera_titularizacion: suplenciaData.primera_titularizacion || null,
           segunda_titularizacion: suplenciaData.segunda_titularizacion || null,
-          observaciones: suplenciaData.observaciones
+          observaciones: suplenciaData.observaciones,
         }),
       });
 
@@ -592,7 +602,7 @@ export default function Page() {
         setMensajeSuplencia("Error al guardar: " + (data.error || "Error desconocido"));
       }
     } catch (error) {
-      console.error('Error al guardar suplencia:', error);
+      console.error("Error al guardar suplencia:", error);
       setMensajeSuplencia("Error al guardar suplencia");
     } finally {
       setGuardandoSuplencia(false);
@@ -613,7 +623,7 @@ export default function Page() {
       fecha_baja: "",
       primera_titularizacion: "",
       segunda_titularizacion: "",
-      observaciones: ""
+      observaciones: "",
     });
     setMensajeSuplencia("");
     setPersonaEncontradaSuplencia(null);
@@ -646,7 +656,7 @@ export default function Page() {
           numero_documento: data[0].dni,
           nombre: data[0].nombre,
           apellido: data[0].apellido,
-          nombre_completo: data[0].nombre_completo
+          nombre_completo: data[0].nombre_completo,
         });
         setSuplenciasHistorial(data);
         setMensajeBusquedaSuplencia(`Se encontraron ${data.length} suplencia(s)`);
@@ -656,7 +666,7 @@ export default function Page() {
         setMensajeBusquedaSuplencia("No se encontraron suplencias para este criterio");
       }
     } catch (error) {
-      console.error('Error al buscar suplencias:', error);
+      console.error("Error al buscar suplencias:", error);
       setDatosSuplente(null);
       setSuplenciasHistorial([]);
       setMensajeBusquedaSuplencia("Error al realizar la búsqueda");
@@ -715,7 +725,7 @@ export default function Page() {
                     <UserPlus className="h-5 w-5" />
                     <span>Cargar Titular</span>
                   </Button>
-                  
+
                   <Dialog open={showBuscarModal} onOpenChange={setShowBuscarModal}>
                     <DialogTrigger asChild>
                       <Button variant="outline" className="flex items-center space-x-2" size="lg">
@@ -726,32 +736,30 @@ export default function Page() {
                     <DialogContent className="sm:max-w-md">
                       <DialogHeader>
                         <DialogTitle>Introducir el valor del parámetro</DialogTitle>
-                        <DialogDescription>
-                          Ingrese N° DNI
-                        </DialogDescription>
+                        <DialogDescription>Ingrese N° DNI</DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Input 
+                          <Input
                             placeholder="N° DNI"
                             value={buscarDni}
                             onChange={(e) => setBuscarDni(e.target.value)}
                           />
                         </div>
                         <div className="flex justify-end space-x-2">
-                          <Button variant="outline" onClick={() => {
-                            setShowBuscarModal(false);
-                            setBuscarDni("");
-                            setMensajeBusqueda("");
-                            setDatosDocente(null);
-                            setEstablecimientosHistorial([]);
-                          }}>
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              setShowBuscarModal(false);
+                              setBuscarDni("");
+                              setMensajeBusqueda("");
+                              setDatosDocente(null);
+                              setEstablecimientosHistorial([]);
+                            }}
+                          >
                             Cancelar
                           </Button>
-                          <Button 
-                            onClick={buscarPersonaPorDni}
-                            disabled={cargandoBusqueda}
-                          >
+                          <Button onClick={buscarPersonaPorDni} disabled={cargandoBusqueda}>
                             {cargandoBusqueda ? "Buscando..." : "Aceptar"}
                           </Button>
                         </div>
@@ -763,7 +771,7 @@ export default function Page() {
                 {/* Mostrar mensaje de búsqueda */}
                 {mensajeBusqueda && (
                   <div className="mt-4">
-                    <p className="text-sm text-muted-foreground">{mensajeBusqueda}</p>
+                    <p className="text-muted-foreground text-sm">{mensajeBusqueda}</p>
                   </div>
                 )}
 
@@ -772,14 +780,12 @@ export default function Page() {
                   <Card className="mt-6">
                     <CardHeader>
                       <CardTitle>Establecimientos donde el docente es o fue Titular</CardTitle>
-                      <CardDescription>
-                        Historial de establecimientos y movimientos del docente
-                      </CardDescription>
+                      <CardDescription>Historial de establecimientos y movimientos del docente</CardDescription>
                     </CardHeader>
                     <CardContent>
                       {/* Información del docente */}
-                      <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      <div className="mb-6 rounded-lg bg-blue-50 p-4">
+                        <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
                           <div>
                             <span className="font-medium text-gray-600">Numero Documento:</span>
                             <div className="font-semibold">{datosDocente.numero_documento}</div>
@@ -794,89 +800,96 @@ export default function Page() {
                           </div>
                           <div>
                             <span className="font-medium text-gray-600">Denominacion del Cargo:</span>
-                            <div className="font-semibold">{datosDocente.cargo || 'Maestro de Especialidades - Nivel Inicial y/o Primario - MUSICA'}</div>
+                            <div className="font-semibold">
+                              {datosDocente.cargo || "Maestro de Especialidades - Nivel Inicial y/o Primario - MUSICA"}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      
-                      <div className="border border-gray-200 rounded-lg bg-white">
+
+                      <div className="rounded-lg border border-gray-200 bg-white">
                         <Table>
                           <TableHeader>
-                            <TableRow className="bg-gray-50 border-b border-gray-200">
-                              <TableHead className="h-12 px-4 text-left align-middle font-medium text-gray-500 text-sm">Fecha de Titularización</TableHead>
-                              <TableHead className="h-12 px-4 text-left align-middle font-medium text-gray-500 text-sm">Fecha de Traslado o Baja</TableHead>
-                              <TableHead className="h-12 px-4 text-left align-middle font-medium text-gray-500 text-sm">Establecimiento</TableHead>
-                              <TableHead className="h-12 px-4 text-center align-middle font-medium text-gray-500 text-sm">Años</TableHead>
-                              <TableHead className="h-12 px-4 text-center align-middle font-medium text-gray-500 text-sm">Meses</TableHead>
-                              <TableHead className="h-12 px-4 text-center align-middle font-medium text-gray-500 text-sm">Días</TableHead>
-                              <TableHead className="h-12 px-4 text-center align-middle font-medium text-gray-500 text-sm">Tipo de Traslado</TableHead>
+                            <TableRow className="border-b border-gray-200 bg-gray-50">
+                              <TableHead className="h-12 px-4 text-left align-middle text-sm font-medium text-gray-500">
+                                Fecha de Titularización
+                              </TableHead>
+                              <TableHead className="h-12 px-4 text-left align-middle text-sm font-medium text-gray-500">
+                                Fecha de Traslado o Baja
+                              </TableHead>
+                              <TableHead className="h-12 px-4 text-left align-middle text-sm font-medium text-gray-500">
+                                Establecimiento
+                              </TableHead>
+                              <TableHead className="h-12 px-4 text-center align-middle text-sm font-medium text-gray-500">
+                                Años
+                              </TableHead>
+                              <TableHead className="h-12 px-4 text-center align-middle text-sm font-medium text-gray-500">
+                                Meses
+                              </TableHead>
+                              <TableHead className="h-12 px-4 text-center align-middle text-sm font-medium text-gray-500">
+                                Días
+                              </TableHead>
+                              <TableHead className="h-12 px-4 text-center align-middle text-sm font-medium text-gray-500">
+                                Tipo de Traslado
+                              </TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {establecimientosHistorial.map((establecimiento: any, index) => (
                               <TableRow key={index} className="border-b border-gray-100 hover:bg-gray-50/50">
                                 <TableCell className="px-4 py-3 text-sm">
-                                  {new Date(establecimiento.fecha_titularizacion).toLocaleDateString('es-ES', {
-                                    day: '2-digit',
-                                    month: '2-digit',
-                                    year: 'numeric'
+                                  {new Date(establecimiento.fecha_titularizacion).toLocaleDateString("es-ES", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
                                   })}
                                 </TableCell>
                                 <TableCell className="px-4 py-3 text-sm">
                                   {establecimiento.fecha_traslado_baja ? (
                                     <span className="text-gray-900">
-                                      {new Date(establecimiento.fecha_traslado_baja).toLocaleDateString('es-ES', {
-                                        day: '2-digit',
-                                        month: '2-digit',
-                                        year: 'numeric'
+                                      {new Date(establecimiento.fecha_traslado_baja).toLocaleDateString("es-ES", {
+                                        day: "2-digit",
+                                        month: "2-digit",
+                                        year: "numeric",
                                       })}
                                     </span>
                                   ) : (
                                     <span className="inline-flex items-center text-xs font-medium text-green-700">
-                                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1.5"></div>
+                                      <div className="mr-1.5 h-2 w-2 rounded-full bg-green-500"></div>
                                       Activo
                                     </span>
                                   )}
                                 </TableCell>
                                 <TableCell className="px-4 py-3 text-sm">
-                                  <span className="text-blue-600 font-medium hover:text-blue-800 cursor-pointer">
+                                  <span className="cursor-pointer font-medium text-blue-600 hover:text-blue-800">
                                     {establecimiento.establecimiento}
                                   </span>
                                 </TableCell>
-                                <TableCell className="px-4 py-3 text-sm text-center">
-                                  <span className="font-medium text-gray-900">
-                                    {establecimiento.anos}
-                                  </span>
+                                <TableCell className="px-4 py-3 text-center text-sm">
+                                  <span className="font-medium text-gray-900">{establecimiento.anos}</span>
                                 </TableCell>
-                                <TableCell className="px-4 py-3 text-sm text-center">
-                                  <span className="font-medium text-gray-900">
-                                    {establecimiento.meses}
-                                  </span>
+                                <TableCell className="px-4 py-3 text-center text-sm">
+                                  <span className="font-medium text-gray-900">{establecimiento.meses}</span>
                                 </TableCell>
-                                <TableCell className="px-4 py-3 text-sm text-center">
-                                  <span className="font-medium text-gray-900">
-                                    {establecimiento.dias}
-                                  </span>
+                                <TableCell className="px-4 py-3 text-center text-sm">
+                                  <span className="font-medium text-gray-900">{establecimiento.dias}</span>
                                 </TableCell>
-                                <TableCell className="px-4 py-3 text-sm text-center">
-                                  <span className="text-blue-600 font-medium">
-                                    {establecimiento.tipo_traslado}
-                                  </span>
+                                <TableCell className="px-4 py-3 text-center text-sm">
+                                  <span className="font-medium text-blue-600">{establecimiento.tipo_traslado}</span>
                                 </TableCell>
                               </TableRow>
                             ))}
                           </TableBody>
                         </Table>
-                        
+
                         {/* Paginación */}
-                        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50">
+                        <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-4 py-3">
                           <div className="flex items-center text-sm text-gray-500">
                             <span>0 of {establecimientosHistorial.length} row(s) selected.</span>
                           </div>
                           <div className="flex items-center space-x-6">
                             <div className="flex items-center space-x-2">
                               <span className="text-sm text-gray-500">Rows per page</span>
-                              <select className="border border-gray-300 rounded px-2 py-1 text-sm bg-white">
+                              <select className="rounded border border-gray-300 bg-white px-2 py-1 text-sm">
                                 <option value="10">10</option>
                                 <option value="25">25</option>
                                 <option value="50">50</option>
@@ -886,24 +899,51 @@ export default function Page() {
                               <span>Page 1 of 1</span>
                             </div>
                             <div className="flex items-center space-x-1">
-                              <button className="p-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7M21 19l-7-7 7-7" />
+                              <button
+                                className="rounded border border-gray-300 p-1 disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled
+                              >
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M11 19l-7-7 7-7M21 19l-7-7 7-7"
+                                  />
                                 </svg>
                               </button>
-                              <button className="p-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                              <button
+                                className="rounded border border-gray-300 p-1 disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled
+                              >
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M15 19l-7-7 7-7"
+                                  />
                                 </svg>
                               </button>
-                              <button className="p-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <button
+                                className="rounded border border-gray-300 p-1 disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled
+                              >
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                 </svg>
                               </button>
-                              <button className="p-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                              <button
+                                className="rounded border border-gray-300 p-1 disabled:cursor-not-allowed disabled:opacity-50"
+                                disabled
+                              >
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M13 5l7 7-7 7M5 5l7 7-7 7"
+                                  />
                                 </svg>
                               </button>
                             </div>
@@ -931,13 +971,15 @@ export default function Page() {
               <CardContent className="space-y-6">
                 {/* Mensaje de estado */}
                 {mensajeFormulario && (
-                  <div className={`p-3 rounded-md ${
-                    mensajeFormulario.includes("Error") || mensajeFormulario.includes("requeridos")
-                      ? "bg-red-50 text-red-700 border border-red-200"
-                      : mensajeFormulario.includes("exitosamente")
-                      ? "bg-green-50 text-green-700 border border-green-200"
-                      : "bg-blue-50 text-blue-700 border border-blue-200"
-                  }`}>
+                  <div
+                    className={`rounded-md p-3 ${
+                      mensajeFormulario.includes("Error") || mensajeFormulario.includes("requeridos")
+                        ? "border border-red-200 bg-red-50 text-red-700"
+                        : mensajeFormulario.includes("exitosamente")
+                          ? "border border-green-200 bg-green-50 text-green-700"
+                          : "border border-blue-200 bg-blue-50 text-blue-700"
+                    }`}
+                  >
                     {mensajeFormulario}
                   </div>
                 )}
@@ -946,13 +988,13 @@ export default function Page() {
                   <div className="space-y-2">
                     <Label htmlFor="dni">N° D.N.I.:</Label>
                     <div className="flex gap-2">
-                      <Input 
-                        id="dni" 
-                        placeholder="Ingrese DNI" 
+                      <Input
+                        id="dni"
+                        placeholder="Ingrese DNI"
                         value={formData.dni}
                         onChange={(e) => {
                           const dni = e.target.value;
-                          setFormData(prev => ({ ...prev, dni }));
+                          setFormData((prev) => ({ ...prev, dni }));
                           // Buscar automáticamente cuando el DNI tenga longitud suficiente
                           if (dni.length >= 7) {
                             buscarPersonaFormulario(dni);
@@ -980,11 +1022,11 @@ export default function Page() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="apellido">Apellido:</Label>
-                    <Input 
-                      id="apellido" 
-                      placeholder="Ingrese apellido" 
+                    <Input
+                      id="apellido"
+                      placeholder="Ingrese apellido"
                       value={formData.apellido}
-                      onChange={(e) => setFormData(prev => ({ ...prev, apellido: e.target.value }))}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, apellido: e.target.value }))}
                     />
                   </div>
                 </div>
@@ -992,20 +1034,20 @@ export default function Page() {
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="nombre">Nombre:</Label>
-                    <Input 
-                      id="nombre" 
-                      placeholder="Ingrese nombre" 
+                    <Input
+                      id="nombre"
+                      placeholder="Ingrese nombre"
                       value={formData.nombre}
-                      onChange={(e) => setFormData(prev => ({ ...prev, nombre: e.target.value }))}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, nombre: e.target.value }))}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="cargo">Denominación del Cargo:</Label>
-                    <Input 
-                      id="cargo" 
-                      placeholder="Ingrese denominación del cargo" 
+                    <Input
+                      id="cargo"
+                      placeholder="Ingrese denominación del cargo"
                       value={formData.denominacion_cargo}
-                      onChange={(e) => setFormData(prev => ({ ...prev, denominacion_cargo: e.target.value }))}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, denominacion_cargo: e.target.value }))}
                     />
                   </div>
                 </div>
@@ -1013,31 +1055,31 @@ export default function Page() {
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="fecha-titularizacion">Fecha de Titularización:</Label>
-                    <Input 
-                      id="fecha-titularizacion" 
-                      type="date" 
+                    <Input
+                      id="fecha-titularizacion"
+                      type="date"
                       value={formData.fecha_titularizacion}
-                      onChange={(e) => setFormData(prev => ({ ...prev, fecha_titularizacion: e.target.value }))}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, fecha_titularizacion: e.target.value }))}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="fecha-traslado">Fecha de Traslado-Baja:</Label>
-                    <Input 
-                      id="fecha-traslado" 
-                      type="date" 
+                    <Input
+                      id="fecha-traslado"
+                      type="date"
                       value={formData.fecha_traslado_baja}
-                      onChange={(e) => setFormData(prev => ({ ...prev, fecha_traslado_baja: e.target.value }))}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, fecha_traslado_baja: e.target.value }))}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="establecimiento">Establecimiento:</Label>
-                  <Input 
-                    id="establecimiento" 
-                    placeholder="Ingrese establecimiento" 
+                  <Input
+                    id="establecimiento"
+                    placeholder="Ingrese establecimiento"
                     value={formData.establecimiento}
-                    onChange={(e) => setFormData(prev => ({ ...prev, establecimiento: e.target.value }))}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, establecimiento: e.target.value }))}
                   />
                 </div>
 
@@ -1049,7 +1091,10 @@ export default function Page() {
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="tipo-traslado">Tipo de Traslado:</Label>
-                      <Select value={formData.tipo_traslado} onValueChange={(value) => setFormData(prev => ({ ...prev, tipo_traslado: value }))}>
+                      <Select
+                        value={formData.tipo_traslado}
+                        onValueChange={(value) => setFormData((prev) => ({ ...prev, tipo_traslado: value }))}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccione tipo de traslado" />
                         </SelectTrigger>
@@ -1062,11 +1107,11 @@ export default function Page() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="establecimiento-traslado">Establecimiento del que se traslada:</Label>
-                      <Input 
-                        id="establecimiento-traslado" 
-                        placeholder="Ingrese establecimiento" 
+                      <Input
+                        id="establecimiento-traslado"
+                        placeholder="Ingrese establecimiento"
                         value={formData.establecimiento_traslado}
-                        onChange={(e) => setFormData(prev => ({ ...prev, establecimiento_traslado: e.target.value }))}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, establecimiento_traslado: e.target.value }))}
                       />
                     </div>
                   </div>
@@ -1074,7 +1119,10 @@ export default function Page() {
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <div className="space-y-2">
                       <Label htmlFor="categoria">Categoría:</Label>
-                      <Select value={formData.categoria} onValueChange={(value) => setFormData(prev => ({ ...prev, categoria: value }))}>
+                      <Select
+                        value={formData.categoria}
+                        onValueChange={(value) => setFormData((prev) => ({ ...prev, categoria: value }))}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccione" />
                         </SelectTrigger>
@@ -1087,7 +1135,10 @@ export default function Page() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="turno">Turno:</Label>
-                      <Select value={formData.turno} onValueChange={(value) => setFormData(prev => ({ ...prev, turno: value }))}>
+                      <Select
+                        value={formData.turno}
+                        onValueChange={(value) => setFormData((prev) => ({ ...prev, turno: value }))}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccione" />
                         </SelectTrigger>
@@ -1101,7 +1152,10 @@ export default function Page() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="radio">Radio:</Label>
-                      <Select value={formData.radio} onValueChange={(value) => setFormData(prev => ({ ...prev, radio: value }))}>
+                      <Select
+                        value={formData.radio}
+                        onValueChange={(value) => setFormData((prev) => ({ ...prev, radio: value }))}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccione" />
                         </SelectTrigger>
@@ -1121,23 +1175,23 @@ export default function Page() {
                   </div>
                 </div>
 
-                <div className="flex justify-center space-x-4 pt-6 border-t">
-                  <Button 
-                    className="bg-green-600 hover:bg-green-700 text-white px-6"
+                <div className="flex justify-center space-x-4 border-t pt-6">
+                  <Button
+                    className="bg-green-600 px-6 text-white hover:bg-green-700"
                     onClick={guardarAntiguedad}
                     disabled={guardandoFormulario}
                   >
                     {guardandoFormulario ? (
                       <>
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                         Guardando...
                       </>
                     ) : (
                       "Guardar Antigüedad"
                     )}
                   </Button>
-                  
-                  <Button 
+
+                  <Button
                     variant="outline"
                     onClick={() => {
                       setFormData({
@@ -1153,7 +1207,7 @@ export default function Page() {
                         categoria: "",
                         turno: "",
                         radio: "",
-                        observaciones: ""
+                        observaciones: "",
                       });
                       setPersonaEncontrada(null);
                       setMensajeFormulario("");
@@ -1163,7 +1217,7 @@ export default function Page() {
                     Limpiar Formulario
                   </Button>
 
-                  <Button 
+                  <Button
                     className="bg-blue-500 hover:bg-blue-600"
                     onClick={() => {
                       setShowLicenciasModal(true);
@@ -1173,8 +1227,8 @@ export default function Page() {
                   >
                     Licencias
                   </Button>
-                  
-                  <Button 
+
+                  <Button
                     className="bg-blue-500 hover:bg-blue-600"
                     onClick={() => setShowSuplenciasModal(true)}
                     disabled={guardandoFormulario}
@@ -1220,20 +1274,20 @@ export default function Page() {
                         />
                       </div>
                       <div className="flex justify-end space-x-2">
-                        <Button variant="outline" onClick={() => {
-                          setShowBuscarSuplenciaModal(false);
-                          setBuscarSuplencia("");
-                          setMensajeBusquedaSuplencia("");
-                          setDatosSuplente(null);
-                          setSuplenciasHistorial([]);
-                        }}>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setShowBuscarSuplenciaModal(false);
+                            setBuscarSuplencia("");
+                            setMensajeBusquedaSuplencia("");
+                            setDatosSuplente(null);
+                            setSuplenciasHistorial([]);
+                          }}
+                        >
                           Cancelar
                         </Button>
-                        <Button 
-                          onClick={buscarSuplenciasPorDni}
-                          disabled={cargandoBusquedaSuplencia}
-                        >
-                          <Search className="h-4 w-4 mr-2" />
+                        <Button onClick={buscarSuplenciasPorDni} disabled={cargandoBusquedaSuplencia}>
+                          <Search className="mr-2 h-4 w-4" />
                           {cargandoBusquedaSuplencia ? "Buscando..." : "Buscar"}
                         </Button>
                       </div>
@@ -1245,7 +1299,7 @@ export default function Page() {
               {/* Mostrar mensaje de búsqueda de suplencias */}
               {mensajeBusquedaSuplencia && (
                 <div className="mt-4">
-                  <p className="text-sm text-muted-foreground">{mensajeBusquedaSuplencia}</p>
+                  <p className="text-muted-foreground text-sm">{mensajeBusquedaSuplencia}</p>
                 </div>
               )}
 
@@ -1254,14 +1308,12 @@ export default function Page() {
                 <Card className="mt-6">
                   <CardHeader>
                     <CardTitle>Historial de Suplencias</CardTitle>
-                    <CardDescription>
-                      Información de suplencias del docente
-                    </CardDescription>
+                    <CardDescription>Información de suplencias del docente</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {/* Información del suplente */}
-                    <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div className="mb-6 rounded-lg bg-blue-50 p-4">
+                      <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
                         <div>
                           <span className="font-medium text-gray-600">Numero Documento:</span>
                           <div className="font-semibold">{datosSuplente.numero_documento}</div>
@@ -1276,11 +1328,11 @@ export default function Page() {
                         </div>
                         <div>
                           <span className="font-medium text-gray-600">Establecimiento:</span>
-                          <div className="font-semibold">{suplenciasHistorial[0]?.establecimiento || 'N/A'}</div>
+                          <div className="font-semibold">{suplenciasHistorial[0]?.establecimiento || "N/A"}</div>
                         </div>
                       </div>
                     </div>
-                    
+
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-gray-800 text-white">
@@ -1298,49 +1350,45 @@ export default function Page() {
                         {suplenciasHistorial.map((suplencia: any, index) => (
                           <TableRow key={index} className="hover:bg-gray-50">
                             <TableCell className="text-sm">
-                              {suplencia.fecha_inicio ? 
-                                new Date(suplencia.fecha_inicio).toLocaleDateString('es-ES', {
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                  year: 'numeric'
-                                }) : 
-                                'N/A'
-                              }
+                              {suplencia.fecha_inicio
+                                ? new Date(suplencia.fecha_inicio).toLocaleDateString("es-ES", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                  })
+                                : "N/A"}
                             </TableCell>
                             <TableCell className="text-sm">
-                              {suplencia.fecha_baja ? 
-                                new Date(suplencia.fecha_baja).toLocaleDateString('es-ES', {
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                  year: 'numeric'
-                                }) : 
-                                'Activa'
-                              }
+                              {suplencia.fecha_baja
+                                ? new Date(suplencia.fecha_baja).toLocaleDateString("es-ES", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                  })
+                                : "Activa"}
                             </TableCell>
-                            <TableCell className="text-sm font-medium">{suplencia.establecimiento || 'N/A'}</TableCell>
-                            <TableCell className="text-sm">{suplencia.cargo || 'N/A'}</TableCell>
-                            <TableCell className="text-sm text-center">{suplencia.radio || 'N/A'}</TableCell>
+                            <TableCell className="text-sm font-medium">{suplencia.establecimiento || "N/A"}</TableCell>
+                            <TableCell className="text-sm">{suplencia.cargo || "N/A"}</TableCell>
+                            <TableCell className="text-center text-sm">{suplencia.radio || "N/A"}</TableCell>
                             <TableCell className="text-sm">
-                              {suplencia.primera_titularizacion ? 
-                                new Date(suplencia.primera_titularizacion).toLocaleDateString('es-ES', {
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                  year: 'numeric'
-                                }) : 
-                                '-'
-                              }
+                              {suplencia.primera_titularizacion
+                                ? new Date(suplencia.primera_titularizacion).toLocaleDateString("es-ES", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                  })
+                                : "-"}
                             </TableCell>
                             <TableCell className="text-sm">
-                              {suplencia.segunda_titularizacion ? 
-                                new Date(suplencia.segunda_titularizacion).toLocaleDateString('es-ES', {
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                  year: 'numeric'
-                                }) : 
-                                '-'
-                              }
+                              {suplencia.segunda_titularizacion
+                                ? new Date(suplencia.segunda_titularizacion).toLocaleDateString("es-ES", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                  })
+                                : "-"}
                             </TableCell>
-                            <TableCell className="text-sm">{suplencia.observaciones || '-'}</TableCell>
+                            <TableCell className="text-sm">{suplencia.observaciones || "-"}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -1382,33 +1430,36 @@ export default function Page() {
       </Tabs>
 
       {/* Modal de Licencias */}
-      <Dialog open={showLicenciasModal} onOpenChange={(open) => {
-        setShowLicenciasModal(open);
-        if (open) {
-          // Cargar tipos de licencia cuando se abre el modal
-          cargarTiposLicencia();
-        }
-      }}>
+      <Dialog
+        open={showLicenciasModal}
+        onOpenChange={(open) => {
+          setShowLicenciasModal(open);
+          if (open) {
+            // Cargar tipos de licencia cuando se abre el modal
+            cargarTiposLicencia();
+          }
+        }}
+      >
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <div className="flex items-center space-x-2">
               <CalendarDays className="h-5 w-5" />
               <DialogTitle>Cargar Licencias</DialogTitle>
             </div>
-            <DialogDescription>
-              Complete la información de la licencia
-            </DialogDescription>
+            <DialogDescription>Complete la información de la licencia</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             {/* Mensaje de estado */}
             {mensajeLicencia && (
-              <div className={`p-3 rounded-md ${
-                mensajeLicencia.includes("Error") || mensajeLicencia.includes("requeridos")
-                  ? "bg-red-50 text-red-700 border border-red-200"
-                  : mensajeLicencia.includes("exitosamente")
-                  ? "bg-green-50 text-green-700 border border-green-200"
-                  : "bg-blue-50 text-blue-700 border border-blue-200"
-              }`}>
+              <div
+                className={`rounded-md p-3 ${
+                  mensajeLicencia.includes("Error") || mensajeLicencia.includes("requeridos")
+                    ? "border border-red-200 bg-red-50 text-red-700"
+                    : mensajeLicencia.includes("exitosamente")
+                      ? "border border-green-200 bg-green-50 text-green-700"
+                      : "border border-blue-200 bg-blue-50 text-blue-700"
+                }`}
+              >
                 {mensajeLicencia}
               </div>
             )}
@@ -1417,13 +1468,13 @@ export default function Page() {
               <div className="space-y-2">
                 <Label htmlFor="dni-licencia">D.N.I.:</Label>
                 <div className="flex gap-2">
-                  <Input 
-                    id="dni-licencia" 
-                    placeholder="Ingrese DNI" 
+                  <Input
+                    id="dni-licencia"
+                    placeholder="Ingrese DNI"
                     value={licenciaData.dni}
                     onChange={(e) => {
                       const dni = e.target.value;
-                      setLicenciaData(prev => ({ ...prev, dni }));
+                      setLicenciaData((prev) => ({ ...prev, dni }));
                       // Buscar automáticamente cuando el DNI tenga longitud suficiente
                       if (dni.length >= 7) {
                         buscarPersonaLicencia(dni);
@@ -1449,39 +1500,39 @@ export default function Page() {
                   </Button>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="apellido-licencia">Apellido:</Label>
-                <Input 
-                  id="apellido-licencia" 
-                  placeholder="Ingrese apellido" 
+                <Input
+                  id="apellido-licencia"
+                  placeholder="Ingrese apellido"
                   value={licenciaData.apellido}
-                  onChange={(e) => setLicenciaData(prev => ({ ...prev, apellido: e.target.value }))}
+                  onChange={(e) => setLicenciaData((prev) => ({ ...prev, apellido: e.target.value }))}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="nombre-licencia">Nombre:</Label>
-                <Input 
-                  id="nombre-licencia" 
-                  placeholder="Ingrese nombre" 
+                <Input
+                  id="nombre-licencia"
+                  placeholder="Ingrese nombre"
                   value={licenciaData.nombre}
-                  onChange={(e) => setLicenciaData(prev => ({ ...prev, nombre: e.target.value }))}
+                  onChange={(e) => setLicenciaData((prev) => ({ ...prev, nombre: e.target.value }))}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="tipo-licencia">Tipo de Licencia:</Label>
-                <Select 
-                  value={licenciaData.id_tipo} 
-                  onValueChange={(value) => setLicenciaData(prev => ({ ...prev, id_tipo: value }))}
+                <Select
+                  value={licenciaData.id_tipo}
+                  onValueChange={(value) => setLicenciaData((prev) => ({ ...prev, id_tipo: value }))}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={
-                      tiposLicencia.length === 0 
-                        ? "Cargando tipos de licencia..." 
-                        : "Seleccione tipo de licencia"
-                    } />
+                    <SelectValue
+                      placeholder={
+                        tiposLicencia.length === 0 ? "Cargando tipos de licencia..." : "Seleccione tipo de licencia"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {tiposLicencia.length > 0 ? (
@@ -1498,42 +1549,42 @@ export default function Page() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="fecha-inicio">Fecha de Inicio:</Label>
-                <Input 
-                  id="fecha-inicio" 
-                  type="date" 
+                <Input
+                  id="fecha-inicio"
+                  type="date"
                   value={licenciaData.fecha_inicio}
-                  onChange={(e) => setLicenciaData(prev => ({ ...prev, fecha_inicio: e.target.value }))}
+                  onChange={(e) => setLicenciaData((prev) => ({ ...prev, fecha_inicio: e.target.value }))}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="fecha-finalizacion">Fecha de Finalización:</Label>
-                <Input 
-                  id="fecha-finalizacion" 
-                  type="date" 
+                <Input
+                  id="fecha-finalizacion"
+                  type="date"
                   value={licenciaData.fecha_fin}
-                  onChange={(e) => setLicenciaData(prev => ({ ...prev, fecha_fin: e.target.value }))}
+                  onChange={(e) => setLicenciaData((prev) => ({ ...prev, fecha_fin: e.target.value }))}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="observaciones-licencia">Observaciones:</Label>
-                <Textarea 
-                  id="observaciones-licencia" 
+                <Textarea
+                  id="observaciones-licencia"
                   placeholder="Ingrese observaciones (opcional)"
                   rows={3}
                   value={licenciaData.observaciones}
-                  onChange={(e) => setLicenciaData(prev => ({ ...prev, observaciones: e.target.value }))}
+                  onChange={(e) => setLicenciaData((prev) => ({ ...prev, observaciones: e.target.value }))}
                 />
               </div>
             </div>
-            
+
             <div className="flex justify-end space-x-2 pt-4">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => {
                   setShowLicenciasModal(false);
                   // Limpiar formulario al cancelar
@@ -1544,7 +1595,7 @@ export default function Page() {
                     id_tipo: "",
                     fecha_inicio: "",
                     fecha_fin: "",
-                    observaciones: ""
+                    observaciones: "",
                   });
                   setPersonaEncontradaLicencia(null);
                   setMensajeLicencia("");
@@ -1553,14 +1604,14 @@ export default function Page() {
               >
                 Cancelar
               </Button>
-              <Button 
+              <Button
                 onClick={guardarLicencia}
                 disabled={guardandoLicencia}
                 className="bg-green-600 hover:bg-green-700"
               >
                 {guardandoLicencia ? (
                   <>
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                     Guardando...
                   </>
                 ) : (
@@ -1587,29 +1638,33 @@ export default function Page() {
           <div className="space-y-6">
             {/* Mensaje de estado */}
             {mensajeSuplencia && (
-              <div className={`p-3 rounded-md ${
-                mensajeSuplencia.includes("Error") || mensajeSuplencia.includes("requeridos") || mensajeSuplencia.includes("ATENCIÓN")
-                  ? "bg-red-50 text-red-700 border border-red-200"
-                  : mensajeSuplencia.includes("exitosamente")
-                  ? "bg-green-50 text-green-700 border border-green-200"
-                  : "bg-blue-50 text-blue-700 border border-blue-200"
-              }`}>
+              <div
+                className={`rounded-md p-3 ${
+                  mensajeSuplencia.includes("Error") ||
+                  mensajeSuplencia.includes("requeridos") ||
+                  mensajeSuplencia.includes("ATENCIÓN")
+                    ? "border border-red-200 bg-red-50 text-red-700"
+                    : mensajeSuplencia.includes("exitosamente")
+                      ? "border border-green-200 bg-green-50 text-green-700"
+                      : "border border-blue-200 bg-blue-50 text-blue-700"
+                }`}
+              >
                 {mensajeSuplencia}
               </div>
             )}
 
             {/* Información básica */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="dni-suplencia">N° de D.N.I.:</Label>
                 <div className="flex gap-2">
-                  <Input 
-                    id="dni-suplencia" 
+                  <Input
+                    id="dni-suplencia"
                     placeholder="Ingrese DNI"
                     value={suplenciaData.dni}
                     onChange={(e) => {
                       const dni = e.target.value;
-                      setSuplenciaData(prev => ({ ...prev, dni }));
+                      setSuplenciaData((prev) => ({ ...prev, dni }));
                       // Buscar automáticamente cuando el DNI tenga longitud suficiente
                       if (dni.length >= 7) {
                         buscarPersonaSuplencia(dni);
@@ -1636,56 +1691,56 @@ export default function Page() {
                   </Button>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="apellido-suplencia">Apellido:</Label>
-                <Input 
-                  id="apellido-suplencia" 
+                <Input
+                  id="apellido-suplencia"
                   placeholder="Ingrese apellido"
                   value={suplenciaData.apellido}
-                  onChange={(e) => setSuplenciaData(prev => ({ ...prev, apellido: e.target.value }))}
+                  onChange={(e) => setSuplenciaData((prev) => ({ ...prev, apellido: e.target.value }))}
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="nombre-suplencia">Nombre:</Label>
-                <Input 
-                  id="nombre-suplencia" 
+                <Input
+                  id="nombre-suplencia"
                   placeholder="Ingrese nombre"
                   value={suplenciaData.nombre}
-                  onChange={(e) => setSuplenciaData(prev => ({ ...prev, nombre: e.target.value }))}
+                  onChange={(e) => setSuplenciaData((prev) => ({ ...prev, nombre: e.target.value }))}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="cargo-suplencia">Cargo:</Label>
-                <Input 
-                  id="cargo-suplencia" 
+                <Input
+                  id="cargo-suplencia"
                   placeholder="Ingrese cargo"
                   value={suplenciaData.cargo}
-                  onChange={(e) => setSuplenciaData(prev => ({ ...prev, cargo: e.target.value }))}
+                  onChange={(e) => setSuplenciaData((prev) => ({ ...prev, cargo: e.target.value }))}
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="establecimiento-suplencia">Establecimiento:</Label>
-                <Input 
-                  id="establecimiento-suplencia" 
+                <Input
+                  id="establecimiento-suplencia"
                   placeholder="Ingrese establecimiento"
                   value={suplenciaData.establecimiento}
-                  onChange={(e) => setSuplenciaData(prev => ({ ...prev, establecimiento: e.target.value }))}
+                  onChange={(e) => setSuplenciaData((prev) => ({ ...prev, establecimiento: e.target.value }))}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="radio-suplencia">Radio:</Label>
-                <Select 
-                  value={suplenciaData.radio} 
-                  onValueChange={(value) => setSuplenciaData(prev => ({ ...prev, radio: value }))}
+                <Select
+                  value={suplenciaData.radio}
+                  onValueChange={(value) => setSuplenciaData((prev) => ({ ...prev, radio: value }))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccione radio" />
@@ -1700,56 +1755,56 @@ export default function Page() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="fecha-inicio-suplencia">Fecha de Inicio:</Label>
-                <Input 
-                  id="fecha-inicio-suplencia" 
+                <Input
+                  id="fecha-inicio-suplencia"
                   type="date"
                   value={suplenciaData.fecha_inicio}
-                  onChange={(e) => setSuplenciaData(prev => ({ ...prev, fecha_inicio: e.target.value }))}
+                  onChange={(e) => setSuplenciaData((prev) => ({ ...prev, fecha_inicio: e.target.value }))}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="fecha-baja-suplencia">Fecha de Baja:</Label>
-                <Input 
-                  id="fecha-baja-suplencia" 
+                <Input
+                  id="fecha-baja-suplencia"
                   type="date"
                   value={suplenciaData.fecha_baja}
-                  onChange={(e) => setSuplenciaData(prev => ({ ...prev, fecha_baja: e.target.value }))}
+                  onChange={(e) => setSuplenciaData((prev) => ({ ...prev, fecha_baja: e.target.value }))}
                 />
               </div>
             </div>
 
             {/* Sección especial con borde rojo para fechas de titularización */}
-            <div className="border-2 border-red-300 rounded-lg p-4 bg-red-50">
-              <div className="text-red-600 font-medium mb-3">
+            <div className="rounded-lg border-2 border-red-300 bg-red-50 p-4">
+              <div className="mb-3 font-medium text-red-600">
                 Fechas de Titularización (Máximo 2 suplencias antes de titularizar):
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="primera-fecha" className="text-red-600">
                     1° Fecha de Titularización:
                   </Label>
-                  <Input 
-                    id="primera-fecha" 
+                  <Input
+                    id="primera-fecha"
                     type="date"
                     value={suplenciaData.primera_titularizacion}
-                    onChange={(e) => setSuplenciaData(prev => ({ ...prev, primera_titularizacion: e.target.value }))}
+                    onChange={(e) => setSuplenciaData((prev) => ({ ...prev, primera_titularizacion: e.target.value }))}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="segunda-fecha" className="text-red-600">
                     2° Fecha de Titularización:
                   </Label>
-                  <Input 
-                    id="segunda-fecha" 
+                  <Input
+                    id="segunda-fecha"
                     type="date"
                     value={suplenciaData.segunda_titularizacion}
-                    onChange={(e) => setSuplenciaData(prev => ({ ...prev, segunda_titularizacion: e.target.value }))}
+                    onChange={(e) => setSuplenciaData((prev) => ({ ...prev, segunda_titularizacion: e.target.value }))}
                   />
                 </div>
               </div>
@@ -1758,18 +1813,18 @@ export default function Page() {
             {/* Observaciones */}
             <div className="space-y-2">
               <Label htmlFor="observaciones-suplencia">Observaciones:</Label>
-              <Textarea 
-                id="observaciones-suplencia" 
+              <Textarea
+                id="observaciones-suplencia"
                 placeholder="Ingrese observaciones (opcional)"
                 rows={3}
                 value={suplenciaData.observaciones}
-                onChange={(e) => setSuplenciaData(prev => ({ ...prev, observaciones: e.target.value }))}
+                onChange={(e) => setSuplenciaData((prev) => ({ ...prev, observaciones: e.target.value }))}
               />
             </div>
 
             {/* Sección de botones en la parte inferior */}
-            <div className="flex justify-between items-center pt-4 border-t">
-              <div className="flex space-x-2 items-center">
+            <div className="flex items-center justify-between border-t pt-4">
+              <div className="flex items-center space-x-2">
                 <Label htmlFor="buscar-dni-suplencia" className="text-sm">
                   Buscar DNI:
                 </Label>
@@ -1778,32 +1833,32 @@ export default function Page() {
                   placeholder="Ingrese DNI"
                   value={suplenciaData.buscarDni}
                   onChange={(e) => {
-                    setSuplenciaData(prev => ({...prev, buscarDni: e.target.value}));
+                    setSuplenciaData((prev) => ({ ...prev, buscarDni: e.target.value }));
                     if (e.target.value.length >= 7) {
                       buscarPersonaSuplencia(e.target.value);
                     }
                   }}
                   className="w-32"
                 />
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => buscarPersonaSuplencia(suplenciaData.buscarDni)}
                 >
                   Buscar
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={limpiarFormularioSuplencia}
                 >
                   Nuevo
                 </Button>
               </div>
-              
+
               <div className="flex space-x-2">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => {
                     setShowSuplenciasModal(false);
                     limpiarFormularioSuplencia();
@@ -1812,14 +1867,14 @@ export default function Page() {
                 >
                   Cancelar
                 </Button>
-                <Button 
+                <Button
                   onClick={guardarSuplencia}
                   disabled={guardandoSuplencia}
                   className="bg-blue-600 hover:bg-blue-700"
                 >
                   {guardandoSuplencia ? (
                     <>
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                       Guardando...
                     </>
                   ) : (
@@ -1831,7 +1886,6 @@ export default function Page() {
           </div>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }

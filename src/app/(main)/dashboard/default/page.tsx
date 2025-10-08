@@ -8,7 +8,14 @@ import { Users, FileUser, Calendar, FileText, List, UserPlus, Search, X, Calenda
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -138,9 +145,7 @@ export default function Page() {
 
               if (dataSuplencias.success && dataSuplencias.data.length > 0) {
                 // Buscar suplencias de esta persona
-                const suplenciasPersona = dataSuplencias.data.filter((sup: any) =>
-                  sup.dni === dni.trim()
-                );
+                const suplenciasPersona = dataSuplencias.data.filter((sup: any) => sup.dni === dni.trim());
                 if (suplenciasPersona.length > 0) {
                   ultimoCargo = suplenciasPersona[0].cargo || "";
                 }
@@ -805,6 +810,7 @@ export default function Page() {
                             </div>
                           </div>
                         </div>
+                      </div>
 
                       <div className="rounded-lg border border-gray-200 bg-white">
                         <Table>
@@ -1840,18 +1846,10 @@ export default function Page() {
                   }}
                   className="w-32"
                 />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => buscarPersonaSuplencia(suplenciaData.buscarDni)}
-                >
+                <Button variant="outline" size="sm" onClick={() => buscarPersonaSuplencia(suplenciaData.buscarDni)}>
                   Buscar
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={limpiarFormularioSuplencia}
-                >
+                <Button variant="outline" size="sm" onClick={limpiarFormularioSuplencia}>
                   Nuevo
                 </Button>
               </div>

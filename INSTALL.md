@@ -25,6 +25,7 @@
 4. Haz clic en **Continuar** para ejecutar
 
 Este script creará:
+
 - ✅ Tabla `roles` (admin, usuario, moderador)
 - ✅ Tabla `usuarios` (sistema de autenticación)
 - ✅ Tabla `sesiones` (control de sesiones)
@@ -64,6 +65,7 @@ La aplicación estará disponible en: `http://localhost:3000`
 ## 🔐 Credenciales por Defecto
 
 ### Usuario Administrador
+
 - **Usuario:** `admin`
 - **Email:** `admin@juntaprimaria.gov.ar`
 - **Contraseña:** `admin123`
@@ -114,20 +116,24 @@ node scripts/generate-admin-hash.js
 ## 🚨 Solución de Problemas
 
 ### Error de Conexión a Base de Datos
+
 1. Verifica que Laragon esté iniciado
 2. Comprueba que MySQL esté corriendo
 3. Revisa las credenciales en `.env.local`
 
 ### Error "Table doesn't exist"
+
 1. Ejecuta el script `database/auth-tables.sql` en phpMyAdmin
 2. Verifica que la base de datos `junta_primaria_db` existe
 
 ### Error de Autenticación
+
 1. Verifica que las tablas `usuarios` y `roles` existan
 2. Comprueba que el usuario `admin` esté insertado
 3. Revisa la consola del navegador para errores
 
 ### Puerto 3000 en Uso
+
 ```bash
 # Cambiar puerto
 npm run dev -- -p 3001

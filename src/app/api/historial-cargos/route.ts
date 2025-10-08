@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createConnection } from '@/lib/database';
+import { NextRequest, NextResponse } from "next/server";
+import { createConnection } from "@/lib/database";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,10 +17,10 @@ export async function POST(request: NextRequest) {
       categoria,
       turno,
       radio,
-      observaciones
+      observaciones,
     } = await request.json();
 
-    console.log('Datos recibidos:', {
+    console.log("Datos recibidos:", {
       id_persona,
       numero_documento,
       apellido,
@@ -34,15 +34,12 @@ export async function POST(request: NextRequest) {
       categoria,
       turno,
       radio,
-      observaciones
+      observaciones,
     });
 
     // Validaciones básicas
     if (!numero_documento || !apellido || !nombre) {
-      return NextResponse.json(
-        { error: 'DNI, apellido y nombre son requeridos' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "DNI, apellido y nombre son requeridos" }, { status: 400 });
     }
 
     const connection = await createConnection();
@@ -50,12 +47,12 @@ export async function POST(request: NextRequest) {
     try {
       // Primero, verificar si la persona existe, si no, crearla
       let personaId = id_persona;
-      
+
       if (!personaId) {
         // Buscar si la persona ya existe
         const [existingPersons] = await connection.execute(
-          'SELECT id_persona FROM personas WHERE numero_documento = ?',
-          [numero_documento]
+          "SELECT id_persona FROM personas WHERE numero_documento = ?",
+          [numero_documento],
         );
 
         if (Array.isArray(existingPersons) && existingPersons.length > 0) {
@@ -63,8 +60,8 @@ export async function POST(request: NextRequest) {
         } else {
           // Crear nueva persona
           const [insertResult] = await connection.execute(
-            'INSERT INTO personas (numero_documento, apellido, nombre) VALUES (?, ?, ?)',
-            [numero_documento, apellido, nombre]
+            "INSERT INTO personas (numero_documento, apellido, nombre) VALUES (?, ?, ?)",
+            [numero_documento, apellido, nombre],
           );
           personaId = (insertResult as any).insertId;
         }
@@ -74,8 +71,8 @@ export async function POST(request: NextRequest) {
       let cargoId = null;
       if (denominacion_cargo) {
         const [existingCargos] = await connection.execute(
-          'SELECT id_cargo FROM denominaciondecargos WHERE denominacion = ?',
-          [denominacion_cargo]
+          "SELECT id_cargo FROM denominaciondecargos WHERE denominacion = ?",
+          [denominacion_cargo],
         );
 
         if (Array.isArray(existingCargos) && existingCargos.length > 0) {
@@ -105,48 +102,40 @@ export async function POST(request: NextRequest) {
         establecimiento || null,
         observaciones || null,
         1, // activo por defecto
-        5  // id_estado por defecto (según la imagen parece ser el estado "trasladado ordinario")
+        5, // id_estado por defecto (según la imagen parece ser el estado "trasladado ordinario")
       ]);
 
       await connection.end();
 
       return NextResponse.json({
         success: true,
-        message: 'Historial de cargo guardado exitosamente',
+        message: "Historial de cargo guardado exitosamente",
         data: {
           id_historial: (result as any).insertId,
-          id_persona: personaId
-        }
+          id_persona: personaId,
+        },
       });
-
     } catch (dbError) {
       await connection.end();
-      console.error('Error en la base de datos:', dbError);
+      console.error("Error en la base de datos:", dbError);
       return NextResponse.json(
-        { error: 'Error al guardar en la base de datos: ' + (dbError as Error).message },
-        { status: 500 }
+        { error: "Error al guardar en la base de datos: " + (dbError as Error).message },
+        { status: 500 },
       );
     }
-
   } catch (error) {
-    console.error('Error en la API de historial de cargos:', error);
-    return NextResponse.json(
-      { error: 'Error interno del servidor: ' + (error as Error).message },
-      { status: 500 }
-    );
+    console.error("Error en la API de historial de cargos:", error);
+    return NextResponse.json({ error: "Error interno del servidor: " + (error as Error).message }, { status: 500 });
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const dni = searchParams.get('dni');
+    const dni = searchParams.get("dni");
 
     if (!dni) {
-      return NextResponse.json(
-        { error: 'DNI es requerido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "DNI es requerido" }, { status: 400 });
     }
 
     const connection = await createConnection();
@@ -180,23 +169,15 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        data: rows
+        data: rows,
       });
-
     } catch (dbError) {
       await connection.end();
-      console.error('Error en la consulta:', dbError);
-      return NextResponse.json(
-        { error: 'Error en la consulta a la base de datos' },
-        { status: 500 }
-      );
+      console.error("Error en la consulta:", dbError);
+      return NextResponse.json({ error: "Error en la consulta a la base de datos" }, { status: 500 });
     }
-
   } catch (error) {
-    console.error('Error en la API:', error);
-    return NextResponse.json(
-      { error: 'Error interno del servidor' },
-      { status: 500 }
-    );
+    console.error("Error en la API:", error);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

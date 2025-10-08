@@ -126,21 +126,13 @@ const suplenciasColumns: ColumnDef<Suplencia>[] = [
   {
     accessorKey: "dni",
     header: ({ column }) => <DataTableColumnHeader column={column} title="DNI" />,
-    cell: ({ row }) => (
-      <div className="font-medium">
-        {row.original.dni}
-      </div>
-    ),
+    cell: ({ row }) => <div className="font-medium">{row.original.dni}</div>,
     enableSorting: false,
   },
   {
     accessorKey: "nombre_completo",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Nombre y Apellido" />,
-    cell: ({ row }) => (
-      <div className="min-w-[200px]">
-        {row.original.nombre_completo}
-      </div>
-    ),
+    cell: ({ row }) => <div className="min-w-[200px]">{row.original.nombre_completo}</div>,
     enableSorting: false,
   },
   {
@@ -158,31 +150,19 @@ const suplenciasColumns: ColumnDef<Suplencia>[] = [
   {
     accessorKey: "cargo",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Cargo" />,
-    cell: ({ row }) => (
-      <div className="min-w-[150px]">
-        {row.original.cargo}
-      </div>
-    ),
+    cell: ({ row }) => <div className="min-w-[150px]">{row.original.cargo}</div>,
     enableSorting: false,
   },
   {
     accessorKey: "radio",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Radio" />,
-    cell: ({ row }) => (
-      <div className="w-16 text-center">
-        {row.original.radio}
-      </div>
-    ),
+    cell: ({ row }) => <div className="w-16 text-center">{row.original.radio}</div>,
     enableSorting: false,
   },
   {
     accessorKey: "fecha_inicio",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Fecha Inicio" />,
-    cell: ({ row }) => (
-      <div className="w-24">
-        {new Date(row.original.fecha_inicio).toLocaleDateString('es-ES')}
-      </div>
-    ),
+    cell: ({ row }) => <div className="w-24">{new Date(row.original.fecha_inicio).toLocaleDateString("es-ES")}</div>,
     enableSorting: false,
   },
   {
@@ -212,17 +192,10 @@ const suplenciasColumns: ColumnDef<Suplencia>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => toast("Editar suplencia")}>
-              Editar
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => toast("Ver detalles")}>
-              Ver detalles
-            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => toast("Editar suplencia")}>Editar</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => toast("Ver detalles")}>Ver detalles</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              onClick={() => toast("Eliminar suplencia")}
-              className="text-destructive"
-            >
+            <DropdownMenuItem onClick={() => toast("Eliminar suplencia")} className="text-destructive">
               Eliminar
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -235,12 +208,12 @@ const suplenciasColumns: ColumnDef<Suplencia>[] = [
 export default function SuplenciasPage() {
   const searchParams = useSearchParams();
   const initialSearch = searchParams.get("search") || "";
-  
+
   const [data, setData] = React.useState<Suplencia[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [searchTerm, setSearchTerm] = React.useState(initialSearch);
   const [filteredData, setFilteredData] = React.useState<Suplencia[]>([]);
-  
+
   // Función para normalizar texto quitando acentos
   const normalizeText = (text: string) => {
     return text
@@ -253,17 +226,18 @@ export default function SuplenciasPage() {
   React.useEffect(() => {
     fetchSuplencias();
   }, []);
-  
+
   // Filtrar datos cuando cambie el término de búsqueda
   React.useEffect(() => {
     const normalizedSearchTerm = normalizeText(searchTerm);
-    
-    const filtered = data.filter(suplencia =>
-      normalizeText(suplencia.dni).includes(normalizedSearchTerm) ||
-      normalizeText(suplencia.nombre_completo).includes(normalizedSearchTerm) ||
-      normalizeText(suplencia.establecimiento).includes(normalizedSearchTerm) ||
-      normalizeText(suplencia.cargo).includes(normalizedSearchTerm) ||
-      normalizeText(suplencia.radio).includes(normalizedSearchTerm)
+
+    const filtered = data.filter(
+      (suplencia) =>
+        normalizeText(suplencia.dni).includes(normalizedSearchTerm) ||
+        normalizeText(suplencia.nombre_completo).includes(normalizedSearchTerm) ||
+        normalizeText(suplencia.establecimiento).includes(normalizedSearchTerm) ||
+        normalizeText(suplencia.cargo).includes(normalizedSearchTerm) ||
+        normalizeText(suplencia.radio).includes(normalizedSearchTerm),
     );
     setFilteredData(filtered);
   }, [data, searchTerm]);
@@ -272,11 +246,11 @@ export default function SuplenciasPage() {
     try {
       setLoading(true);
       const response = await fetch("/api/suplencias");
-      
+
       if (response.ok) {
         const apiData = await response.json();
         console.log("Datos de la API:", apiData);
-        
+
         // Transformar los datos de la API al formato que necesita la tabla
         const transformedData: Suplencia[] = apiData.map((item: any) => ({
           id: item.id_suplencia,
@@ -289,9 +263,9 @@ export default function SuplenciasPage() {
           fecha_baja: item.fecha_baja,
           primera_titularizacion: item.primera_titularizacion,
           segunda_titularizacion: item.segunda_titularizacion,
-          status: getStatusFromData(item)
+          status: getStatusFromData(item),
         }));
-        
+
         setData(transformedData);
       } else {
         console.error("Error al cargar suplencias");
@@ -315,16 +289,16 @@ export default function SuplenciasPage() {
   };
 
   const columns = withDndColumn(suplenciasColumns);
-  const table = useDataTableInstance({ 
-    data: filteredData, 
-    columns, 
-    getRowId: (row) => row.id.toString() 
+  const table = useDataTableInstance({
+    data: filteredData,
+    columns,
+    getRowId: (row) => row.id.toString(),
   });
 
   if (loading) {
     return (
       <div className="@container/main flex flex-col gap-4 md:gap-6">
-        <div className="flex items-center justify-center h-64">
+        <div className="flex h-64 items-center justify-center">
           <div className="text-lg">Cargando suplencias...</div>
         </div>
       </div>
@@ -344,7 +318,7 @@ export default function SuplenciasPage() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold">Registros de Suplencias</h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Mostrando {filteredData.length} de {data.length} registros
             </p>
           </div>
@@ -352,7 +326,12 @@ export default function SuplenciasPage() {
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="gap-2">
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
             Descargar Excel
           </Button>
@@ -365,15 +344,25 @@ export default function SuplenciasPage() {
 
       {/* Barra de búsqueda */}
       <div className="flex items-center gap-4 py-4">
-        <div className="relative flex-1 max-w-sm">
-          <svg className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        <div className="relative max-w-sm flex-1">
+          <svg
+            className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
           </svg>
           <input
             placeholder="Buscar..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 pl-10 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
       </div>
@@ -381,23 +370,24 @@ export default function SuplenciasPage() {
       {/* Tabla de Suplencias */}
       <div className="relative flex flex-col gap-4 overflow-auto">
         <div className="overflow-hidden rounded-lg border">
-          <DataTableNew 
-            dndEnabled 
-            table={table} 
-            columns={columns} 
+          <DataTableNew
+            dndEnabled
+            table={table}
+            columns={columns}
             onReorder={(newData) => {
               setData(newData);
               // Aplicar filtro inmediatamente después del reorder usando normalización
               const normalizedSearchTerm = normalizeText(searchTerm);
-              const filtered = newData.filter(suplencia =>
-                normalizeText(suplencia.dni).includes(normalizedSearchTerm) ||
-                normalizeText(suplencia.nombre_completo).includes(normalizedSearchTerm) ||
-                normalizeText(suplencia.establecimiento).includes(normalizedSearchTerm) ||
-                normalizeText(suplencia.cargo).includes(normalizedSearchTerm) ||
-                normalizeText(suplencia.radio).includes(normalizedSearchTerm)
+              const filtered = newData.filter(
+                (suplencia) =>
+                  normalizeText(suplencia.dni).includes(normalizedSearchTerm) ||
+                  normalizeText(suplencia.nombre_completo).includes(normalizedSearchTerm) ||
+                  normalizeText(suplencia.establecimiento).includes(normalizedSearchTerm) ||
+                  normalizeText(suplencia.cargo).includes(normalizedSearchTerm) ||
+                  normalizeText(suplencia.radio).includes(normalizedSearchTerm),
               );
               setFilteredData(filtered);
-            }} 
+            }}
           />
         </div>
         <DataTablePagination table={table} />

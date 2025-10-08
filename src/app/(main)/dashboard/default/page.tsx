@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useRouter } from "next/navigation";
 import { Users, FileUser, Calendar, FileText, List, UserPlus, Search, X, CalendarDays } from "lucide-react";
@@ -23,6 +23,7 @@ export default function Page() {
   const [showCargarForm, setShowCargarForm] = useState(false);
   const [showBuscarModal, setShowBuscarModal] = useState(false);
   const [showLicenciasModal, setShowLicenciasModal] = useState(false);
+  const [activeFormTab, setActiveFormTab] = useState("cargar-antiguedad");
 
   const [buscarDni, setBuscarDni] = useState("");
   
@@ -207,6 +208,13 @@ export default function Page() {
       setMensajeLicencia('Error al cargar tipos de licencia');
     }
   };
+
+  // Efecto para cargar tipos de licencia cuando se cambia a la pestaña de licencias
+  useEffect(() => {
+    if (activeFormTab === 'licencias-form' && tiposLicencia.length === 0) {
+      cargarTiposLicencia();
+    }
+  }, [activeFormTab, tiposLicencia.length]);
 
   // Función para buscar persona por DNI para licencias
   const buscarPersonaLicencia = async (dni: string) => {
@@ -920,15 +928,34 @@ export default function Page() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>Cargar Antigüedad Titular</CardTitle>
-                    <CardDescription>Complete todos los campos requeridos</CardDescription>
+                    <CardTitle>Gestión de Titulares</CardTitle>
+                    <CardDescription>Complete la información según la pestaña seleccionada</CardDescription>
                   </div>
                   <Button variant="outline" size="sm" onClick={() => setShowCargarForm(false)}>
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4">
+                {/* Pestañas internas del formulario */}
+                <Tabs value={activeFormTab} onValueChange={setActiveFormTab} className="space-y-4">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="cargar-antiguedad" className="flex items-center space-x-2">
+                      <Calendar className="h-4 w-4" />
+                      <span>Cargar Antigüedad</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="suplencias-form" className="flex items-center space-x-2">
+                      <FileUser className="h-4 w-4" />
+                      <span>Suplencias</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="licencias-form" className="flex items-center space-x-2">
+                      <CalendarDays className="h-4 w-4" />
+                      <span>Licencias</span>
+                    </TabsTrigger>
+                  </TabsList>
+
+                  {/* Pestaña de Cargar Antigüedad */}
+                  <TabsContent value="cargar-antiguedad" className="space-y-6">
                 {/* Mensaje de estado */}
                 {mensajeFormulario && (
                   <div className={`p-3 rounded-md ${
@@ -1042,7 +1069,7 @@ export default function Page() {
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="rounded bg-gray-100 p-2 text-lg font-medium">
+                  <h3 className="rounded p-2 text-lg font-medium">
                     Datos para conformar el Listado de Traslado
                   </h3>
 
@@ -1163,25 +1190,396 @@ export default function Page() {
                     Limpiar Formulario
                   </Button>
 
-                  <Button 
-                    className="bg-blue-500 hover:bg-blue-600"
-                    onClick={() => {
-                      setShowLicenciasModal(true);
-                      cargarTiposLicencia();
-                    }}
-                    disabled={guardandoFormulario}
-                  >
-                    Licencias
-                  </Button>
-                  
-                  <Button 
-                    className="bg-blue-500 hover:bg-blue-600"
-                    onClick={() => setShowSuplenciasModal(true)}
-                    disabled={guardandoFormulario}
-                  >
-                    Cargar Suplencias
-                  </Button>
                 </div>
+                  </TabsContent>
+
+                  {/* Pestaña de Suplencias */}
+                  <TabsContent value="suplencias-form" className="space-y-6">
+                    {/* Mensaje de estado */}
+                    {mensajeSuplencia && (
+                      <div className={`p-3 rounded-md ${
+                        mensajeSuplencia.includes("Error") || mensajeSuplencia.includes("requeridos") || mensajeSuplencia.includes("ATENCIÓN")
+                          ? "bg-red-50 text-red-700 border border-red-200"
+                          : mensajeSuplencia.includes("exitosamente")
+                          ? "bg-green-50 text-green-700 border border-green-200"
+                          : "bg-blue-50 text-blue-700 border border-blue-200"
+                      }`}>
+                        {mensajeSuplencia}
+                      </div>
+                    )}
+
+                    {/* Información básica */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="dni-suplencia">N° de D.N.I.:</Label>
+                        <div className="flex gap-2">
+                          <Input 
+                            id="dni-suplencia" 
+                            placeholder="Ingrese DNI"
+                            value={suplenciaData.dni}
+                            onChange={(e) => {
+                              const dni = e.target.value;
+                              setSuplenciaData(prev => ({ ...prev, dni }));
+                              // Buscar automáticamente cuando el DNI tenga longitud suficiente
+                              if (dni.length >= 7) {
+                                buscarPersonaSuplencia(dni);
+                              } else {
+                                setPersonaEncontradaSuplencia(null);
+                                setMensajeSuplencia("");
+                                setSuplenciasActivas(0);
+                              }
+                            }}
+                            disabled={cargandoPersonaSuplencia}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => buscarPersonaSuplencia(suplenciaData.dni)}
+                            disabled={cargandoPersonaSuplencia || !suplenciaData.dni.trim()}
+                          >
+                            {cargandoPersonaSuplencia ? (
+                              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-500 border-t-transparent" />
+                            ) : (
+                              <Search className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="apellido-suplencia">Apellido:</Label>
+                        <Input 
+                          id="apellido-suplencia" 
+                          placeholder="Ingrese apellido"
+                          value={suplenciaData.apellido}
+                          onChange={(e) => setSuplenciaData(prev => ({ ...prev, apellido: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="nombre-suplencia">Nombre:</Label>
+                        <Input 
+                          id="nombre-suplencia" 
+                          placeholder="Ingrese nombre"
+                          value={suplenciaData.nombre}
+                          onChange={(e) => setSuplenciaData(prev => ({ ...prev, nombre: e.target.value }))}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="cargo-suplencia">Cargo:</Label>
+                        <Input 
+                          id="cargo-suplencia" 
+                          placeholder="Ingrese cargo"
+                          value={suplenciaData.cargo}
+                          onChange={(e) => setSuplenciaData(prev => ({ ...prev, cargo: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="establecimiento-suplencia">Establecimiento:</Label>
+                        <Input 
+                          id="establecimiento-suplencia" 
+                          placeholder="Ingrese establecimiento"
+                          value={suplenciaData.establecimiento}
+                          onChange={(e) => setSuplenciaData(prev => ({ ...prev, establecimiento: e.target.value }))}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="radio-suplencia">Radio:</Label>
+                        <Select 
+                          value={suplenciaData.radio} 
+                          onValueChange={(value) => setSuplenciaData(prev => ({ ...prev, radio: value }))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccione radio" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="I">I</SelectItem>
+                            <SelectItem value="II">II</SelectItem>
+                            <SelectItem value="III">III</SelectItem>
+                            <SelectItem value="IV">IV</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="fecha-inicio-suplencia">Fecha de Inicio:</Label>
+                        <Input 
+                          id="fecha-inicio-suplencia" 
+                          type="date"
+                          value={suplenciaData.fecha_inicio}
+                          onChange={(e) => setSuplenciaData(prev => ({ ...prev, fecha_inicio: e.target.value }))}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="fecha-baja-suplencia">Fecha de Baja:</Label>
+                        <Input 
+                          id="fecha-baja-suplencia" 
+                          type="date"
+                          value={suplenciaData.fecha_baja}
+                          onChange={(e) => setSuplenciaData(prev => ({ ...prev, fecha_baja: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Sección especial con borde rojo para fechas de titularización */}
+                    <div className="border-2 border-red-500 dark:border-red-400 rounded-lg p-4">
+                      <div className="text-red-600 dark:text-red-400 font-medium mb-3">
+                        Fechas de Titularización (Máximo 2 suplencias antes de titularizar):
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="primera-fecha" className="text-red-600 dark:text-red-400">
+                            1° Fecha de Titularización:
+                          </Label>
+                          <Input 
+                            id="primera-fecha" 
+                            type="date"
+                            value={suplenciaData.primera_titularizacion}
+                            onChange={(e) => setSuplenciaData(prev => ({ ...prev, primera_titularizacion: e.target.value }))}
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="segunda-fecha" className="text-red-600 dark:text-red-400">
+                            2° Fecha de Titularización:
+                          </Label>
+                          <Input 
+                            id="segunda-fecha" 
+                            type="date"
+                            value={suplenciaData.segunda_titularizacion}
+                            onChange={(e) => setSuplenciaData(prev => ({ ...prev, segunda_titularizacion: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Observaciones */}
+                    <div className="space-y-2">
+                      <Label htmlFor="observaciones-suplencia">Observaciones:</Label>
+                      <Textarea 
+                        id="observaciones-suplencia" 
+                        placeholder="Ingrese observaciones (opcional)"
+                        rows={3}
+                        value={suplenciaData.observaciones}
+                        onChange={(e) => setSuplenciaData(prev => ({ ...prev, observaciones: e.target.value }))}
+                      />
+                    </div>
+
+                    <div className="flex justify-center space-x-4 pt-6 border-t">
+                      <Button 
+                        className="bg-green-600 hover:bg-green-700 text-white px-6"
+                        onClick={guardarSuplencia}
+                        disabled={guardandoSuplencia}
+                      >
+                        {guardandoSuplencia ? (
+                          <>
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                            Guardando...
+                          </>
+                        ) : (
+                          "Guardar Suplencia"
+                        )}
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        className="px-6"
+                        onClick={limpiarFormularioSuplencia}
+                        disabled={guardandoSuplencia}
+                      >
+                        Limpiar Formulario
+                      </Button>
+                    </div>
+                  </TabsContent>
+
+                  {/* Pestaña de Licencias */}
+                  <TabsContent value="licencias-form" className="space-y-4">
+                    {/* Mensaje de estado */}
+                    {mensajeLicencia && (
+                      <div className={`p-3 rounded-md ${
+                        mensajeLicencia.includes("Error") || mensajeLicencia.includes("requeridos")
+                          ? "bg-red-50 text-red-700 border border-red-200"
+                          : mensajeLicencia.includes("exitosamente")
+                          ? "bg-green-50 text-green-700 border border-green-200"
+                          : "bg-blue-50 text-blue-700 border border-blue-200"
+                      }`}>
+                        {mensajeLicencia}
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="dni-licencia">D.N.I.:</Label>
+                        <div className="flex gap-2">
+                          <Input 
+                            id="dni-licencia" 
+                            placeholder="Ingrese DNI" 
+                            value={licenciaData.dni}
+                            onChange={(e) => {
+                              const dni = e.target.value;
+                              setLicenciaData(prev => ({ ...prev, dni }));
+                              // Buscar automáticamente cuando el DNI tenga longitud suficiente
+                              if (dni.length >= 7) {
+                                buscarPersonaLicencia(dni);
+                              } else {
+                                setPersonaEncontradaLicencia(null);
+                                setMensajeLicencia("");
+                              }
+                            }}
+                            disabled={cargandoPersonaLicencia}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => buscarPersonaLicencia(licenciaData.dni)}
+                            disabled={cargandoPersonaLicencia || !licenciaData.dni.trim()}
+                          >
+                            {cargandoPersonaLicencia ? (
+                              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-500 border-t-transparent" />
+                            ) : (
+                              <Search className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="apellido-licencia">Apellido:</Label>
+                        <Input 
+                          id="apellido-licencia" 
+                          placeholder="Ingrese apellido" 
+                          value={licenciaData.apellido}
+                          onChange={(e) => setLicenciaData(prev => ({ ...prev, apellido: e.target.value }))}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="nombre-licencia">Nombre:</Label>
+                        <Input 
+                          id="nombre-licencia" 
+                          placeholder="Ingrese nombre" 
+                          value={licenciaData.nombre}
+                          onChange={(e) => setLicenciaData(prev => ({ ...prev, nombre: e.target.value }))}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="tipo-licencia">Tipo de Licencia:</Label>
+                        <Select 
+                          value={licenciaData.id_tipo} 
+                          onValueChange={(value) => setLicenciaData(prev => ({ ...prev, id_tipo: value }))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={
+                              tiposLicencia.length === 0 
+                                ? "Cargando tipos de licencia..." 
+                                : "Seleccione tipo de licencia"
+                            } />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {tiposLicencia.length > 0 ? (
+                              tiposLicencia.map((tipo: any) => (
+                                <SelectItem key={tipo.id_tipo} value={tipo.id_tipo.toString()}>
+                                  {tipo.descripcion}
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="loading" disabled>
+                                Cargando tipos de licencia...
+                              </SelectItem>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="fecha-inicio">Fecha de Inicio:</Label>
+                        <Input 
+                          id="fecha-inicio" 
+                          type="date" 
+                          value={licenciaData.fecha_inicio}
+                          onChange={(e) => setLicenciaData(prev => ({ ...prev, fecha_inicio: e.target.value }))}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="fecha-finalizacion">Fecha de Finalización:</Label>
+                        <Input 
+                          id="fecha-finalizacion" 
+                          type="date" 
+                          value={licenciaData.fecha_fin}
+                          onChange={(e) => setLicenciaData(prev => ({ ...prev, fecha_fin: e.target.value }))}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="observaciones-licencia">Observaciones:</Label>
+                        <Textarea 
+                          id="observaciones-licencia" 
+                          placeholder="Ingrese observaciones (opcional)"
+                          rows={3}
+                          value={licenciaData.observaciones}
+                          onChange={(e) => setLicenciaData(prev => ({ ...prev, observaciones: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-center space-x-4 pt-6 border-t">
+                      <Button 
+                        className="bg-green-600 hover:bg-green-700 text-white px-6"
+                        onClick={() => {
+                          if (tiposLicencia.length === 0) {
+                            cargarTiposLicencia();
+                          }
+                          guardarLicencia();
+                        }}
+                        disabled={guardandoLicencia}
+                      >
+                        {guardandoLicencia ? (
+                          <>
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                            Guardando...
+                          </>
+                        ) : (
+                          "Guardar Licencia"
+                        )}
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        className="px-6"
+                        onClick={() => {
+                          // Limpiar formulario
+                          setLicenciaData({
+                            dni: "",
+                            apellido: "",
+                            nombre: "",
+                            id_tipo: "",
+                            fecha_inicio: "",
+                            fecha_fin: "",
+                            observaciones: ""
+                          });
+                          setPersonaEncontradaLicencia(null);
+                          setMensajeLicencia("");
+                        }}
+                        disabled={guardandoLicencia}
+                      >
+                        Limpiar Formulario
+                      </Button>
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           )}
@@ -1531,9 +1929,24 @@ export default function Page() {
               </div>
             </div>
             
-            <div className="flex justify-end space-x-2 pt-4">
+            <div className="flex justify-center space-x-4 pt-6 border-t">
               <Button 
-                variant="outline" 
+                className="bg-green-600 hover:bg-green-700 text-white px-6"
+                onClick={guardarLicencia}
+                disabled={guardandoLicencia}
+              >
+                {guardandoLicencia ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                    Guardando...
+                  </>
+                ) : (
+                  "Guardar Licencia"
+                )}
+              </Button>
+              <Button 
+                variant="outline"
+                className="px-6"
                 onClick={() => {
                   setShowLicenciasModal(false);
                   // Limpiar formulario al cancelar
@@ -1552,20 +1965,6 @@ export default function Page() {
                 disabled={guardandoLicencia}
               >
                 Cancelar
-              </Button>
-              <Button 
-                onClick={guardarLicencia}
-                disabled={guardandoLicencia}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                {guardandoLicencia ? (
-                  <>
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
-                    Guardando...
-                  </>
-                ) : (
-                  "Guardar"
-                )}
               </Button>
             </div>
           </div>
@@ -1723,14 +2122,14 @@ export default function Page() {
             </div>
 
             {/* Sección especial con borde rojo para fechas de titularización */}
-            <div className="border-2 border-red-300 rounded-lg p-4 bg-red-50">
-              <div className="text-red-600 font-medium mb-3">
+            <div className="border-2 border-red-500 dark:border-red-400 rounded-lg p-4">
+              <div className="text-red-600 dark:text-red-400 font-medium mb-3">
                 Fechas de Titularización (Máximo 2 suplencias antes de titularizar):
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="primera-fecha" className="text-red-600">
+                  <Label htmlFor="primera-fecha" className="text-red-600 dark:text-red-400">
                     1° Fecha de Titularización:
                   </Label>
                   <Input 
@@ -1742,7 +2141,7 @@ export default function Page() {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="segunda-fecha" className="text-red-600">
+                  <Label htmlFor="segunda-fecha" className="text-red-600 dark:text-red-400">
                     2° Fecha de Titularización:
                   </Label>
                   <Input 
@@ -1768,65 +2167,32 @@ export default function Page() {
             </div>
 
             {/* Sección de botones en la parte inferior */}
-            <div className="flex justify-between items-center pt-4 border-t">
-              <div className="flex space-x-2 items-center">
-                <Label htmlFor="buscar-dni-suplencia" className="text-sm">
-                  Buscar DNI:
-                </Label>
-                <Input
-                  id="buscar-dni-suplencia"
-                  placeholder="Ingrese DNI"
-                  value={suplenciaData.buscarDni}
-                  onChange={(e) => {
-                    setSuplenciaData(prev => ({...prev, buscarDni: e.target.value}));
-                    if (e.target.value.length >= 7) {
-                      buscarPersonaSuplencia(e.target.value);
-                    }
-                  }}
-                  className="w-32"
-                />
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => buscarPersonaSuplencia(suplenciaData.buscarDni)}
-                >
-                  Buscar
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={limpiarFormularioSuplencia}
-                >
-                  Nuevo
-                </Button>
-              </div>
-              
-              <div className="flex space-x-2">
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setShowSuplenciasModal(false);
-                    limpiarFormularioSuplencia();
-                  }}
-                  disabled={guardandoSuplencia}
-                >
-                  Cancelar
-                </Button>
-                <Button 
-                  onClick={guardarSuplencia}
-                  disabled={guardandoSuplencia}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  {guardandoSuplencia ? (
-                    <>
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
-                      Guardando...
-                    </>
-                  ) : (
-                    "Guardar"
-                  )}
-                </Button>
-              </div>
+            <div className="flex justify-center space-x-4 pt-6 border-t">
+              <Button 
+                className="bg-green-600 hover:bg-green-700 text-white px-6"
+                onClick={guardarSuplencia}
+                disabled={guardandoSuplencia}
+              >
+                {guardandoSuplencia ? (
+                  <>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                    Guardando...
+                  </>
+                ) : (
+                  "Guardar Suplencia"
+                )}
+              </Button>
+              <Button 
+                variant="outline"
+                className="px-6"
+                onClick={() => {
+                  setShowSuplenciasModal(false);
+                  limpiarFormularioSuplencia();
+                }}
+                disabled={guardandoSuplencia}
+              >
+                Cancelar
+              </Button>
             </div>
           </div>
         </DialogContent>

@@ -91,6 +91,10 @@ export default function Page() {
   const [suplenciasActivas, setSuplenciasActivas] = useState(0);
   const [showSuplenciasModal, setShowSuplenciasModal] = useState(false);
 
+  // Estados para búsqueda de suplencias (nuevos desde master)
+  const [showBuscarSuplenciaModal, setShowBuscarSuplenciaModal] = useState(false);
+  const [buscarSuplencia, setBuscarSuplencia] = useState("");
+
   // Función para buscar persona por DNI automáticamente en el formulario
   const buscarPersonaFormulario = async (dni: string) => {
     if (!dni.trim() || dni.length < 7) return;
@@ -1349,7 +1353,7 @@ export default function Page() {
         </TabsContent>
 
         <TabsContent value="antiguedad" className="space-y-4">
-          <CalculoAntiguedad />
+          <CalculoAntiguedad onClose={() => setActiveTab("titulares")} />
         </TabsContent>
 
         <TabsContent value="planillas" className="space-y-4">

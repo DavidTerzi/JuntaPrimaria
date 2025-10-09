@@ -29,7 +29,7 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   };
 }
 
-function SidebarInner({ user }: { user?: AppSidebarProps['user'] }) {
+function SidebarInner({ user }: { user?: AppSidebarProps["user"] }) {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
 
@@ -38,7 +38,10 @@ function SidebarInner({ user }: { user?: AppSidebarProps['user'] }) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-3 data-[slot=sidebar-menu-button]:h-auto">
+            <SidebarMenuButton
+              asChild
+              className="data-[slot=sidebar-menu-button]:h-auto data-[slot=sidebar-menu-button]:!p-3"
+            >
               <a href="/dashboard" className="flex items-center justify-center">
                 <Logo size="md" showText={false} collapsed={isCollapsed} className="" />
               </a>

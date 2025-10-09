@@ -45,5 +45,5 @@ export interface UsuarioFilters {
   activo?: boolean;
 }
 
-export type UsuariosSortField = 'nombre' | 'email' | 'username' | 'rol_nombre' | 'ultimo_login' | 'fecha_creacion';
-export type SortDirection = 'asc' | 'desc';
+export type UsuariosSortField = "nombre" | "email" | "username" | "rol_nombre" | "ultimo_login" | "fecha_creacion";
+export type SortDirection = "asc" | "desc";

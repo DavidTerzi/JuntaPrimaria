@@ -18,16 +18,16 @@ export function UsuariosView() {
   const [roles, setRoles] = React.useState<Rol[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
-  
+
   // Estados para formulario
   const [formOpen, setFormOpen] = React.useState(false);
   const [editingUsuario, setEditingUsuario] = React.useState<Usuario | null>(null);
-  
+
   // Estados para filtros
   const [filters, setFilters] = React.useState<UsuarioFilters>({
     search: "",
     rol_id: undefined,
-    activo: undefined
+    activo: undefined,
   });
 
   // Cargar roles al montar el componente
@@ -58,14 +58,14 @@ export function UsuariosView() {
   const fetchUsuarios = async () => {
     try {
       setIsLoading(true);
-      
+
       const params = new URLSearchParams();
       if (filters.search) params.append("search", filters.search);
       if (filters.rol_id) params.append("rol_id", filters.rol_id.toString());
       if (filters.activo !== undefined) params.append("activo", filters.activo.toString());
-      
+
       const response = await fetch(`/api/usuarios?${params.toString()}`);
-      
+
       if (response.ok) {
         const data = await response.json();
         setUsuarios(data.usuarios || []);
@@ -99,7 +99,7 @@ export function UsuariosView() {
   };
 
   const handleDelete = (id: number) => {
-    setUsuarios(prev => prev.filter(u => u.id !== id));
+    setUsuarios((prev) => prev.filter((u) => u.id !== id));
   };
 
   const handleFormSuccess = () => {
@@ -107,20 +107,20 @@ export function UsuariosView() {
   };
 
   const handleSearchChange = (value: string) => {
-    setFilters(prev => ({ ...prev, search: value }));
+    setFilters((prev) => ({ ...prev, search: value }));
   };
 
   const handleRolFilterChange = (value: string) => {
-    setFilters(prev => ({ 
-      ...prev, 
-      rol_id: value === "all" ? undefined : parseInt(value) 
+    setFilters((prev) => ({
+      ...prev,
+      rol_id: value === "all" ? undefined : parseInt(value),
     }));
   };
 
   const handleActivoFilterChange = (value: string) => {
-    setFilters(prev => ({ 
-      ...prev, 
-      activo: value === "all" ? undefined : value === "true" 
+    setFilters((prev) => ({
+      ...prev,
+      activo: value === "all" ? undefined : value === "true",
     }));
   };
 
@@ -135,25 +135,14 @@ export function UsuariosView() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Gestión de Usuarios</h1>
-          <p className="text-muted-foreground">
-            Administra los usuarios del sistema y sus permisos
-          </p>
+          <p className="text-muted-foreground">Administra los usuarios del sistema y sus permisos</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-          >
+          <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
             Actualizar
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExportUsers}
-          >
+          <Button variant="outline" size="sm" onClick={handleExportUsers}>
             <Download className="h-4 w-4" />
             Exportar
           </Button>
@@ -179,9 +168,7 @@ export function UsuariosView() {
             <CardTitle className="text-sm font-medium">Usuarios Activos</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {usuarios.filter(u => u.activo).length}
-            </div>
+            <div className="text-2xl font-bold">{usuarios.filter((u) => u.activo).length}</div>
           </CardContent>
         </Card>
         <Card>
@@ -189,9 +176,7 @@ export function UsuariosView() {
             <CardTitle className="text-sm font-medium">Usuarios Inactivos</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {usuarios.filter(u => !u.activo).length}
-            </div>
+            <div className="text-2xl font-bold">{usuarios.filter((u) => !u.activo).length}</div>
           </CardContent>
         </Card>
         <Card>
@@ -208,15 +193,13 @@ export function UsuariosView() {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Filtros de Búsqueda</CardTitle>
-          <CardDescription>
-            Utiliza los filtros para encontrar usuarios específicos
-          </CardDescription>
+          <CardDescription>Utiliza los filtros para encontrar usuarios específicos</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                 <Input
                   placeholder="Buscar por nombre, email, usuario o documento..."
                   value={filters.search}
@@ -262,7 +245,7 @@ export function UsuariosView() {
           <CardTitle>
             Lista de Usuarios
             {usuarios.length > 0 && (
-              <span className="ml-2 text-sm font-normal text-muted-foreground">
+              <span className="text-muted-foreground ml-2 text-sm font-normal">
                 ({usuarios.length} {usuarios.length === 1 ? "usuario" : "usuarios"})
               </span>
             )}

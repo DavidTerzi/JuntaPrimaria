@@ -1,15 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createConnection } from '@/lib/database';
+import { NextRequest, NextResponse } from "next/server";
+import { createConnection } from "@/lib/database";
 
 export async function POST(request: NextRequest) {
   try {
     const { dni } = await request.json();
 
     if (!dni) {
-      return NextResponse.json(
-        { error: 'DNI es requerido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "DNI es requerido" }, { status: 400 });
     }
 
     // Crear conexión a la base de datos con UTF-8
@@ -17,23 +14,21 @@ export async function POST(request: NextRequest) {
 
     try {
       // Primero obtener los datos del docente
-      const [personaRows] = await connection.execute(
-        'SELECT * FROM personas WHERE numero_documento = ?',
-        [dni]
-      );
+      const [personaRows] = await connection.execute("SELECT * FROM personas WHERE numero_documento = ?", [dni]);
 
       if (!Array.isArray(personaRows) || personaRows.length === 0) {
         await connection.end();
         return NextResponse.json({
           success: false,
-          message: 'No se encontró persona con ese DNI'
+          message: "No se encontró persona con ese DNI",
         });
       }
 
       const persona = personaRows[0] as any;
 
       // Buscar historial de cargos del docente
-      const [establecimientosRows] = await connection.execute(`
+      const [establecimientosRows] = await connection.execute(
+        `
         SELECT 
           h.fecha_inicio as fecha_titularizacion,
           h.fecha_fin as fecha_traslado_baja,
@@ -53,7 +48,9 @@ export async function POST(request: NextRequest) {
         LEFT JOIN estados_cargos e ON h.id_estado = e.id_estado
         WHERE h.id_persona = ?
         ORDER BY h.fecha_inicio DESC
-      `, [persona.id_persona]);
+      `,
+        [persona.id_persona],
+      );
 
       const establecimientosHistorial = Array.isArray(establecimientosRows) ? establecimientosRows : [];
 
@@ -63,24 +60,16 @@ export async function POST(request: NextRequest) {
         success: true,
         data: {
           persona: persona,
-          establecimientos: establecimientosHistorial
-        }
+          establecimientos: establecimientosHistorial,
+        },
       });
-
     } catch (dbError) {
       await connection.end();
-      console.error('Error en la consulta:', dbError);
-      return NextResponse.json(
-        { error: 'Error en la consulta a la base de datos' },
-        { status: 500 }
-      );
+      console.error("Error en la consulta:", dbError);
+      return NextResponse.json({ error: "Error en la consulta a la base de datos" }, { status: 500 });
     }
-
   } catch (error) {
-    console.error('Error en la API:', error);
-    return NextResponse.json(
-      { error: 'Error interno del servidor' },
-      { status: 500 }
-    );
+    console.error("Error en la API:", error);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

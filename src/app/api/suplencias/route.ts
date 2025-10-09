@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { executeQuery } from '@/lib/db';
+import { NextRequest, NextResponse } from "next/server";
+import { executeQuery } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
   try {
     // Primero probemos una consulta simple
-    const testQuery = 'SELECT COUNT(*) as total FROM suplencias';
+    const testQuery = "SELECT COUNT(*) as total FROM suplencias";
     const testResult = await executeQuery(testQuery);
-    console.log('Test query result:', testResult);
-    
+    console.log("Test query result:", testResult);
+
     // Query con JOINs seguros y valores por defecto
     const query = `
       SELECT 
@@ -42,15 +42,15 @@ export async function GET(request: NextRequest) {
       LIMIT 100
     `;
 
-    const suplencias = await executeQuery(query) as any[];
-    console.log('Suplencias query result:', suplencias);
+    const suplencias = (await executeQuery(query)) as any[];
+    console.log("Suplencias query result:", suplencias);
 
     return NextResponse.json(suplencias, { status: 200 });
   } catch (error) {
-    console.error('Error al obtener suplencias:', error);
+    console.error("Error al obtener suplencias:", error);
     return NextResponse.json(
-      { error: 'Error interno del servidor', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      { error: "Error interno del servidor", details: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 },
     );
   }
 }
@@ -66,15 +66,12 @@ export async function POST(request: NextRequest) {
       fecha_baja,
       primera_titularizacion,
       segunda_titularizacion,
-      observaciones
+      observaciones,
     } = body;
 
     // Validaciones básicas
     if (!id_persona || !cue || !id_cargo || !fecha_inicio) {
-      return NextResponse.json(
-        { error: 'Faltan campos obligatorios' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Faltan campos obligatorios" }, { status: 400 });
     }
 
     const query = `
@@ -98,20 +95,14 @@ export async function POST(request: NextRequest) {
       fecha_baja || null,
       primera_titularizacion || null,
       segunda_titularizacion || null,
-      observaciones || null
+      observaciones || null,
     ];
 
-    const result = await executeQuery(query, params) as any;
+    const result = (await executeQuery(query, params)) as any;
 
-    return NextResponse.json(
-      { message: 'Suplencia creada exitosamente', id: result.insertId },
-      { status: 201 }
-    );
+    return NextResponse.json({ message: "Suplencia creada exitosamente", id: result.insertId }, { status: 201 });
   } catch (error) {
-    console.error('Error al crear suplencia:', error);
-    return NextResponse.json(
-      { error: 'Error interno del servidor' },
-      { status: 500 }
-    );
+    console.error("Error al crear suplencia:", error);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

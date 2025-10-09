@@ -25,7 +25,7 @@ const usuarioSchema = z.object({
   documento: z.string().optional(),
   telefono: z.string().optional(),
   rol_id: z.number().min(1, "Debe seleccionar un rol"),
-  activo: z.boolean()
+  activo: z.boolean(),
 });
 
 type UsuarioSchemaType = z.infer<typeof usuarioSchema>;
@@ -53,8 +53,8 @@ export function UsuarioForm({ usuario, roles, open, onOpenChange, onSuccess }: U
       documento: usuario?.documento || "",
       telefono: usuario?.telefono || "",
       rol_id: usuario?.rol_id || 0,
-      activo: usuario?.activo ?? true
-    }
+      activo: usuario?.activo ?? true,
+    },
   });
 
   // Resetear form cuando cambia el usuario
@@ -69,7 +69,7 @@ export function UsuarioForm({ usuario, roles, open, onOpenChange, onSuccess }: U
         documento: usuario.documento || "",
         telefono: usuario.telefono || "",
         rol_id: usuario.rol_id,
-        activo: usuario.activo
+        activo: usuario.activo,
       });
     } else {
       form.reset();
@@ -81,7 +81,7 @@ export function UsuarioForm({ usuario, roles, open, onOpenChange, onSuccess }: U
     try {
       const payload = {
         ...data,
-        ...(isEdit && { id: usuario.id })
+        ...(isEdit && { id: usuario.id }),
       };
 
       // Si es edición y no se cambió la contraseña, no incluirla
@@ -92,9 +92,9 @@ export function UsuarioForm({ usuario, roles, open, onOpenChange, onSuccess }: U
       const response = await fetch("/api/usuarios", {
         method: isEdit ? "PUT" : "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
@@ -117,16 +117,13 @@ export function UsuarioForm({ usuario, roles, open, onOpenChange, onSuccess }: U
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>
-            {isEdit ? "Editar Usuario" : "Crear Nuevo Usuario"}
-          </DialogTitle>
+          <DialogTitle>{isEdit ? "Editar Usuario" : "Crear Nuevo Usuario"}</DialogTitle>
           <DialogDescription>
-            {isEdit 
+            {isEdit
               ? "Modifica los datos del usuario. Los campos marcados son obligatorios."
-              : "Completa los datos para crear un nuevo usuario. Los campos marcados son obligatorios."
-            }
+              : "Completa los datos para crear un nuevo usuario. Los campos marcados son obligatorios."}
           </DialogDescription>
         </DialogHeader>
 
@@ -195,14 +192,12 @@ export function UsuarioForm({ usuario, roles, open, onOpenChange, onSuccess }: U
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    {isEdit ? "Nueva Contraseña (opcional)" : "Contraseña *"}
-                  </FormLabel>
+                  <FormLabel>{isEdit ? "Nueva Contraseña (opcional)" : "Contraseña *"}</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="password" 
-                      placeholder={isEdit ? "Dejar vacío para mantener actual" : "Ingrese la contraseña"} 
-                      {...field} 
+                    <Input
+                      type="password"
+                      placeholder={isEdit ? "Dejar vacío para mantener actual" : "Ingrese la contraseña"}
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -253,11 +248,13 @@ export function UsuarioForm({ usuario, roles, open, onOpenChange, onSuccess }: U
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {roles.filter(rol => rol.activo).map((rol) => (
-                        <SelectItem key={rol.id} value={rol.id.toString()}>
-                          {rol.nombre}
-                        </SelectItem>
-                      ))}
+                      {roles
+                        .filter((rol) => rol.activo)
+                        .map((rol) => (
+                          <SelectItem key={rol.id} value={rol.id.toString()}>
+                            {rol.nombre}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -272,31 +269,21 @@ export function UsuarioForm({ usuario, roles, open, onOpenChange, onSuccess }: U
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
                     <FormLabel className="text-base">Usuario Activo</FormLabel>
-                    <div className="text-sm text-muted-foreground">
-                      El usuario puede acceder al sistema
-                    </div>
+                    <div className="text-muted-foreground text-sm">El usuario puede acceder al sistema</div>
                   </div>
                   <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
                 </FormItem>
               )}
             />
 
             <div className="flex justify-end gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isLoading}
-              >
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
                 Cancelar
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Guardando..." : (isEdit ? "Actualizar" : "Crear")}
+                {isLoading ? "Guardando..." : isEdit ? "Actualizar" : "Crear"}
               </Button>
             </div>
           </form>

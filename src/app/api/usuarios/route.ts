@@ -13,9 +13,18 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10");
     const sortFieldParam = searchParams.get("sortField") || "fecha_creacion";
     const sortDirection = searchParams.get("sortDirection") || "desc";
-    
+
     // Validar campo de ordenamiento para prevenir SQL injection
-    const validSortFields = ["id", "username", "email", "nombre", "apellido", "documento", "fecha_creacion", "fecha_actualizacion"];
+    const validSortFields = [
+      "id",
+      "username",
+      "email",
+      "nombre",
+      "apellido",
+      "documento",
+      "fecha_creacion",
+      "fecha_actualizacion",
+    ];
     const sortField = validSortFields.includes(sortFieldParam) ? sortFieldParam : "fecha_creacion";
 
     // Construir condiciones WHERE
@@ -23,7 +32,9 @@ export async function GET(request: NextRequest) {
     let queryParams: any[] = [];
 
     if (search) {
-      whereConditions.push("(u.nombre LIKE ? OR u.apellido LIKE ? OR u.email LIKE ? OR u.username LIKE ? OR u.documento LIKE ?)");
+      whereConditions.push(
+        "(u.nombre LIKE ? OR u.apellido LIKE ? OR u.email LIKE ? OR u.username LIKE ? OR u.documento LIKE ?)",
+      );
       const searchTerm = `%${search}%`;
       queryParams.push(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm);
     }
@@ -43,11 +54,11 @@ export async function GET(request: NextRequest) {
 
     // Query simplificada sin LIMIT para debug
     const query = `SELECT * FROM usuarios LIMIT 10`;
-    const usuarios = await executeQuery(query, []) as any[];
+    const usuarios = (await executeQuery(query, [])) as any[];
 
     // Query para contar total simplificada
     const countQuery = `SELECT COUNT(*) as total FROM usuarios`;
-    const totalResult = await executeQuery(countQuery, []) as any[];
+    const totalResult = (await executeQuery(countQuery, [])) as any[];
     const total = totalResult[0]?.total || 0;
 
     return NextResponse.json({
@@ -56,16 +67,12 @@ export async function GET(request: NextRequest) {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     });
-
   } catch (error) {
     console.error("Error al obtener usuarios:", error);
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
 
@@ -77,23 +84,17 @@ export async function POST(request: NextRequest) {
 
     // Validaciones básicas
     if (!username || !email || !password || !nombre || !apellido || !rol_id) {
-      return NextResponse.json(
-        { error: "Campos requeridos faltantes" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Campos requeridos faltantes" }, { status: 400 });
     }
 
     // Verificar si el usuario ya existe
-    const existingUser = await executeQuery(
-      "SELECT id FROM usuarios WHERE username = ? OR email = ?",
-      [username, email]
-    ) as any[];
+    const existingUser = (await executeQuery("SELECT id FROM usuarios WHERE username = ? OR email = ?", [
+      username,
+      email,
+    ])) as any[];
 
     if (existingUser.length > 0) {
-      return NextResponse.json(
-        { error: "El usuario o email ya existe" },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: "El usuario o email ya existe" }, { status: 409 });
     }
 
     // Encriptar contraseña
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    const result = await executeQuery(insertQuery, [
+    const result = (await executeQuery(insertQuery, [
       username,
       email,
       password_hash,
@@ -115,20 +116,19 @@ export async function POST(request: NextRequest) {
       documento || null,
       telefono || null,
       rol_id,
-      activo ? 1 : 0
-    ]) as any;
+      activo ? 1 : 0,
+    ])) as any;
 
-    return NextResponse.json({
-      message: "Usuario creado exitosamente",
-      id: result.insertId
-    }, { status: 201 });
-
+    return NextResponse.json(
+      {
+        message: "Usuario creado exitosamente",
+        id: result.insertId,
+      },
+      { status: 201 },
+    );
   } catch (error) {
     console.error("Error al crear usuario:", error);
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
 
@@ -139,36 +139,24 @@ export async function PUT(request: NextRequest) {
     const { id, username, email, password, nombre, apellido, documento, telefono, rol_id, activo } = body;
 
     if (!id) {
-      return NextResponse.json(
-        { error: "ID de usuario requerido" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "ID de usuario requerido" }, { status: 400 });
     }
 
     // Verificar si el usuario existe
-    const existingUser = await executeQuery(
-      "SELECT id FROM usuarios WHERE id = ?",
-      [id]
-    ) as any[];
+    const existingUser = (await executeQuery("SELECT id FROM usuarios WHERE id = ?", [id])) as any[];
 
     if (existingUser.length === 0) {
-      return NextResponse.json(
-        { error: "Usuario no encontrado" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
     }
 
     // Verificar duplicados (excluyendo el usuario actual)
-    const duplicateCheck = await executeQuery(
+    const duplicateCheck = (await executeQuery(
       "SELECT id FROM usuarios WHERE (username = ? OR email = ?) AND id != ?",
-      [username, email, id]
-    ) as any[];
+      [username, email, id],
+    )) as any[];
 
     if (duplicateCheck.length > 0) {
-      return NextResponse.json(
-        { error: "El usuario o email ya existe" },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: "El usuario o email ya existe" }, { status: 409 });
     }
 
     // Construir query de actualización
@@ -215,10 +203,7 @@ export async function PUT(request: NextRequest) {
     }
 
     if (updateFields.length === 0) {
-      return NextResponse.json(
-        { error: "No hay campos para actualizar" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "No hay campos para actualizar" }, { status: 400 });
     }
 
     updateFields.push("fecha_actualizacion = NOW()");
@@ -233,15 +218,11 @@ export async function PUT(request: NextRequest) {
     await executeQuery(updateQuery, updateParams);
 
     return NextResponse.json({
-      message: "Usuario actualizado exitosamente"
+      message: "Usuario actualizado exitosamente",
     });
-
   } catch (error) {
     console.error("Error al actualizar usuario:", error);
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
 
@@ -252,37 +233,24 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json(
-        { error: "ID de usuario requerido" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "ID de usuario requerido" }, { status: 400 });
     }
 
     // Verificar si el usuario existe
-    const existingUser = await executeQuery(
-      "SELECT id FROM usuarios WHERE id = ?",
-      [id]
-    ) as any[];
+    const existingUser = (await executeQuery("SELECT id FROM usuarios WHERE id = ?", [id])) as any[];
 
     if (existingUser.length === 0) {
-      return NextResponse.json(
-        { error: "Usuario no encontrado" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
     }
 
     // Eliminar usuario
     await executeQuery("DELETE FROM usuarios WHERE id = ?", [id]);
 
     return NextResponse.json({
-      message: "Usuario eliminado exitosamente"
+      message: "Usuario eliminado exitosamente",
     });
-
   } catch (error) {
     console.error("Error al eliminar usuario:", error);
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

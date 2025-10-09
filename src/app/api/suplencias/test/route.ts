@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { executeQuery } from '@/lib/db';
+import { NextRequest, NextResponse } from "next/server";
+import { executeQuery } from "@/lib/db";
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,14 +21,14 @@ export async function GET(request: NextRequest) {
     `;
 
     const suplencias = await executeQuery(query);
-    console.log('Suplencias simple query result:', suplencias);
+    console.log("Suplencias simple query result:", suplencias);
 
     return NextResponse.json(suplencias, { status: 200 });
   } catch (error) {
-    console.error('Error al obtener suplencias:', error);
+    console.error("Error al obtener suplencias:", error);
     return NextResponse.json(
-      { error: 'Error interno del servidor', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      { error: "Error interno del servidor", details: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 },
     );
   }
 }

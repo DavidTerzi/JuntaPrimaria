@@ -3,13 +3,11 @@
 import { useState, useEffect } from "react";
 
 import { useRouter } from "next/navigation";
+
 import { Users, FileUser, Calendar, FileText, List, UserPlus, Search, X, CalendarDays } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -18,11 +16,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 
 import CalculoAntiguedad from "./_components/calculo-antiguedad";
+import GenerarListado from "./generar-listado";
+import ImpresionPlanillas from "./impresion-planillas";
 
 export default function Page() {
   const router = useRouter();
@@ -1819,27 +1822,11 @@ export default function Page() {
         </TabsContent>
 
         <TabsContent value="planillas" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Impresión de Planillas</CardTitle>
-              <CardDescription>Generar e imprimir planillas del sistema</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">Contenido de planillas - En desarrollo</p>
-            </CardContent>
-          </Card>
+          <ImpresionPlanillas onClose={() => setActiveTab("titulares")} />
         </TabsContent>
 
         <TabsContent value="listado" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Generar Listado</CardTitle>
-              <CardDescription>Crear y exportar listados del sistema</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">Contenido de listados - En desarrollo</p>
-            </CardContent>
-          </Card>
+          <GenerarListado onBack={() => setActiveTab("titulares")} />
         </TabsContent>
       </Tabs>
 

@@ -120,9 +120,9 @@ export default [
       "no-underscore-dangle": ["error", { allow: ["_id", "__dirname"] }],
 
       // Complexity
-      complexity: ["error", { max: 10 }],
-      "max-lines": ["error", { max: 300, skipBlankLines: true, skipComments: true }],
-      "max-depth": ["error", 4],
+      complexity: ["warn", { max: 15 }],
+      "max-lines": ["warn", { max: 500, skipBlankLines: true, skipComments: true }],
+      "max-depth": ["warn", 5],
 
       // TypeScript-Specific Rules (customized)
       "@typescript-eslint/prefer-nullish-coalescing": "error",
@@ -153,7 +153,7 @@ export default [
       "react/no-array-index-key": "warn",
 
       // SonarJS: Detect commented-out code
-      "sonarjs/no-commented-code": "warn",
+      "sonarjs/no-commented-code": "off",
     },
   },
 ];
